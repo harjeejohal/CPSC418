@@ -104,7 +104,43 @@ of length 8:\\
 
 Therefore, approximately 54.9\% of passwords satisfy the requirement in (c).\\
 
-\item (\textbf{Bonus})\\
+\item (\textbf{Bonus}) In order to find the number of passwords of length 8 with at least one numerical digit and at least one special character and at least one uppercase letter, it is easier to find
+all of the passwords that violate this condition, and then subtract that from the total of passwords. We'll represent the number of passwords with at least one uppercase, at least one special character, and
+at least one numerical digit as $n_{target}$.\\
+The total number of passwords of length 8 using 94 printable characters is $94^8$. Let us represent this value as $n_{total}$.\\
+
+Next, we must find the number of passwords of length 8 without any uppercase letters. There are 26 uppercase letters, so the total number of passwords of length 8 without an uppercase letter is $(94 - 26)^8 = 68^8$.
+We'll represent this value as $n_{uppercase}$.\\
+
+We must also find the number of passwords of length 8 without any special characters. This was computed in part (c) and found to be $62^8$. We'll represent this value as $n_{special}$.\\
+
+The next value to calculate is the number of passwords of length 8 without any numerical digits. This was also computed in part (c) and found to be $84^8$. We'll represent this value as $n_{numerical}$.\\
+
+Also similarly to part (c), if we subtract $n_{uppercase}, n_{special}$, and $n_{numerical}$ from $n_{total}$, we'll end up subtracting passwords that fall into two of these categories twice. Namely,
+passwords that fall into both $n_{uppercase}$ and $n_{special}$, passwords that fall into both $n_{uppercase}$ and $n_{numerical}$, and passwords that fall into both $n_{special}$ and $n_{numerical}$ will end up
+being subtracted twice. In order to counter this, each of these subsets must be added back. Thus, we must compute the total number of passwords that fall into each of these subsets.\\
+
+The number of passwords of length 8 with neither an uppercase letter nor a special character is $(94 - 26 - 32)^8 = 34^8$. We'll represent this as $n_{uppercase, special}$.\\
+
+The number of passwords of length 8 with neither an uppercase letter nor a numerical digit is $(94 - 26 - 10)^8 = 58^8$. We'll represent this as $n_{uppercase, numerical}$.\\
+
+The number of passwords of length 8 with neither an special character nor a numerical digit is $(94 - 32 - 10)^8 = 52^8$. We'll represent this as $n_{special, numerical}$.\\
+
+With this, we have now accounted for the passwords that fall into two categories. However, there is one more category of passwords that hasn't been considered yet - passwords that have neither an uppercase letter
+nor a special character nor a numerical digit. Let us represent this value as $n_{uppercase,special,numerical}$. This subset is subtracted from the total count three times: once when $n_{uppercase}$ is subtracted from $n_{total}$,
+once when $n_{special}$ is subtracted from $n_{total}$, and once when $n_{numerical}$ is subtracted from $n_{total}$.\\
+$n_{uppercase,special,numerical}$ is also added back to $n_{total}$ three times: once when $n_{uppercase,special}$ is added back to $n_{total}$, once when $n_{uppercase,numerical}$ is added back to $n_{total}$, and
+once when $n_{special,numerical}$ is added back to $n_{total}$. Since $n_{uppercase,special,numerical}$ been subtracted three times and added three times, this subset is still present in the count of passwords
+with neither an uppercase letter nor a special character nor a numerical digit. Therefore, it must be subtracted one more time to be removed from this count.\\
+
+The value of $n_{uppercase,special,numerical}$ is $(94 - 26 - 32 - 10)  = 26^8$.\\
+
+Combining all of this information, we can compute $n_{target}$ as:
+\begin{align*}
+n_{target} &= n_{total} - n_{uppercase} - n_{special} - n_{numerical} + n_{uppercase,special} + n_{uppercase,numerical} + n_{special,numerical} - n_{uppercase,special,numerical}
+&= 94^8 - 68^8 - 62^8 - 84^8 + 34^8 + 58^8 + 52^8 - 26^8
+\end{align*}
+\\Therefore, the value of $n_{target}$ is $94^8 - 68^8 - 62^8 - 84^8 + 34^8 + 58^8 + 52^8 - 26^8$.\\
 
 \item If each permissable character in a password is chosen with equal likelihood, that means that each password in that password space is chosen with equal likelihood. Therefore,
 the entropy of the password space is $log_2(n)$, where \textit{n} is the number of passwords in the password space.\\
@@ -115,7 +151,7 @@ the entropy of the password space is $log_2(n)$, where \textit{n} is the number 
 entropy &= log_2(94^8)\\
 &= 52.43671\ldots \\
 &\approx 52.4\\
-\end{align*}\\
+\end{align*}
 
 \textbf{For part (c):} In part (c) we asserted that the number of passwords of length 8 with at least one numerical digit and at least one special character was $(94^8 - 84^8 - 62^8 - 52^8)$.
 Therefore, the entropy of this password space is:
@@ -124,9 +160,9 @@ Therefore, the entropy of this password space is:
 entropy &= log_2(94^8 - 84^8 - 62^8 - 52^8)\\
 &= 51.5709\ldots \\
 &\approx 51.6\\
-\end{align*}\\
+\end{align*}
 
-\item Assuming that each password candidate is chosen with equal likelihood, we would need $2^128$ passwords in order to achieve an entropy of 128. Since we have 94 printable
+\item Assuming that each password candidate is chosen with equal likelihood, we would need $2^{128}$ passwords in order to achieve an entropy of 128. Since we have 94 printable
 characters to use in our passwords, that means we just have to determine \textit{x} such that $94^x = 2^{128}$. Solving this equation, we get:\\
 
 \begin{align*}
