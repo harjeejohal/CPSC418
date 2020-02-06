@@ -189,23 +189,206 @@ of 19 would have a entropy below 128. Therefore the minimum password length that
 \item[] \textbf{Problem 3} --- Probabilities of Non-Collisions (26 marks)
 
 \begin{enumerate}
-\item
-\item
-\item
-\item
-\item
-\item
-\item
-\item
+\item If there are \textit{n} numbers, the chance of your favourite number \textit{N} being chosen is $1/n$.
+
+\item If there are \textit{n} numbers, the chance of your favourite number \textit{N} not being chosen is $(\textit{n} - 1)/ n$
+
+\item If there are \textit{n} numbers, and \textit{k} participants, the probability of none of the participants being assigned your favourite number \textit{N} is:
+\begin{align*}
+( \frac{n-1}{n})^k
+\end{align*}
+
+given that the assignment of numbers are independent events.
+
+\item In order to find the maximal value of \textit{k} when $n = 10$ such that the probability \textit{P} of your favourite number \textit{N} not being chosen is 50\%, we use:
+
+\begin{align*}
+( \frac{n-1}{n})^k \geq 0.50
+\end{align*}
+
+However, we know that as \textit{k} increases, the value of \textit{P} decreases. Therefore, we must solve for \textit{k} at the boundary where $P = 50$\%:
+
+\begin{align*}
+( \frac{n-1}{n})^k &= 0.50 \\
+( \frac{10-1}{10})^k &= 0.50 \\
+( \frac{9}{10})^k &= 0.50 \\
+log_2(0.90)^k &= log_2(0.50) \\
+k log_2(0.90) &= -1 \\
+k &= \frac{-1}{log_2(0.90)} \\
+k &= 6.5788\ldots \\
+k &\approx 6.58
+\end{align*}
+
+However, we cannot have such a thing as 6.58 participants. Since the value of $P$ decreases as $k$ increases, we must take the floor of k, 6, in order to ensure that the value
+of $P$ remains above 50\%. Therefore, the maximal number of participants this experiment can have to ensure at least a 50\% chance that none of the pariticipants are
+assigned your favourite number $N$, given that $n = 10$ is 6.
+
+\item If there are $k$ participants, and there are $n$ numbers that are to be independently assigned to the participants, the probabilty of them all receiving different numbers
+can be represented as a product of multiple events:
+
+\begin{align*}
+P_{unique} = P_{first pick unique} * P_{second pick unique} * \ldots * P_{k^{th} pick unique}
+\end{align*}
+
+The probability of the first participant choosing a unique number is 100\%, since no numbers have been assigned yet. The probability of the second participant choosing a unique
+number is the probability of them not choosing the same number as the first participant. The probability of the second participant choosing the same number as the first participant
+is $( \frac{1}{n})$, since only one number out of $n$ has been assigned. Therefore, the probability of them choosing a different number than the first probability is:
+
+\begin{align*}
+P_{second pick unique} = (1 - \frac{1}{n})
+\end{align*}
+
+The probability of the third participant choosing one of the numbers already assigned is $\frac{2}{n}$, since 2 of the $n$ numbers have been assigned. The probability of the third pariticipant
+choosing a different number than the first two participants is $(1 - \frac{2}{n})$.\\
+
+There is a pattern here, were the probability of the $i^{th}$ participant choosing a unique number is $(1 - \frac{i-1}{n})$. Using this information, we can define $P_{unique}$ as:
+
+\begin{align*}
+P_{unique} &= P_{first pick unique} * P_{second pick unique} * \ldots * P_{k^{th} pick unique} \\ 
+&= (1) * (1 - \frac{1}{n}) * (1 - \frac{2}{n}) * (1 - \frac{3}{n}) * \ldots * (1 - \frac{k - 2}{n}) * (1 - \frac{k - 1}{n})\\
+&= (\frac{n}{n}) * (\frac{n - 1}{n}) * (\frac{n - 2}{n}) * (\frac{n - 3}{n}) * \ldots * (\frac{n - k - 2}{n}) * (\frac{n - k - 1}{n})\\
+P_{unique} &= \frac{n!}{(n - k)! * n^k}
+\end{align*}
+
+Therefore, the probability of all $k$ participants being assigned different numbers, when there are $n$ numbers to chose from, is $\frac{n!}{(n - k)! * n^k}$, given that $k \leq n$.
+
+\item If we suppose that $n = 10$, we can find the maximal value of $k$ such that $P_{unique} \geq 0.50$ by testing the values of $k$ in order starting from 1, until 
+the condition $P_{unique} \geq 0.50$ is violated.\\
+
+\textbf{Case $k = 1$:} If $k = 1$, we can sub the values of $k, n$ into the $P_{unique}$ formula derived in part (e):
+
+\begin{align*}
+P_{unique} &= \frac{n!}{(n - k)! * n^k}\\
+&= \frac{10!}{(10 - 1)! * 10^1}\\
+P_{unique} &= 1\\
+1 &\geq 0.5
+\end{align*}
+
+Therefore, $k = 1$ is our current maximal value.\\
+
+\textbf{Case $k = 2$:} If $k = 2$, we can sub the values of $k, n$ into the $P_{unique}$ formula derived in part (e):
+
+\begin{align*}
+P_{unique} &= \frac{n!}{(n - k)! * n^k}\\
+&= \frac{10!}{(10 - 2)! * 10^2}\\
+P_{unique} &= 0.9\\
+0.9 &\geq 0.5
+\end{align*}
+
+Therefore, $k = 2$ is our current maximal value.\\
+
+\textbf{Case $k = 3$:} If $k = 3$, we can sub the values of $k, n$ into the $P_{unique}$ formula derived in part (e):
+
+\begin{align*}
+P_{unique} &= \frac{n!}{(n - k)! * n^k}\\
+&= \frac{10!}{(10 - 3)! * 10^3}\\
+P_{unique} &= 0.72\\
+0.72 &\geq 0.5
+\end{align*}
+
+Therefore, $k = 3$ is our current maximal value.\\
+
+\textbf{Case $k = 4$:} If $k = 4$, we can sub the values of $k, n$ into the $P_{unique}$ formula derived in part (e):
+
+\begin{align*}
+P_{unique} &= \frac{n!}{(n - k)! * n^k}\\
+&= \frac{10!}{(10 - 4)! * 10^4}\\
+P_{unique} &= 0.504\\
+0.504 &\geq 0.5
+\end{align*}
+
+Therefore, $k = 4$ is our current maximal value.\\
+
+\textbf{Case $k = 5$:} If $k = 5$, we can sub the values of $k, n$ into the $P_{unique}$ formula derived in part (e):
+
+\begin{align*}
+P_{unique} &= \frac{n!}{(n - k)! * n^k}\\
+&= \frac{10!}{(10 - 5)! * 10^5}\\
+P_{unique} &= 0.252\\
+0.252 &\ngeq 0.5
+\end{align*}
+
+In this case, $k = 5$ has a $P_{unique}$ value less than 0.5. As can be seen from the past 5 calculations, the value of $P_{unique}$ decreases as $k$ approaches $n$. Therefore, all subsequent values of
+$k$ after $k = 5$ will also have $P_{unique}$ values below 0.5. Thus, the maximal value of $k$ such that $P_{unique} \geq 0.50$ when $n = 10$, is $k = 4$.
+
+\item In part (e), we defined the probability $P$ of $k$ participants being assigned a different number from a list of numbers $n$ as:
+
+\begin{align*}
+P &= (1 - \frac{1}{n}) * (1 - \frac{2}{n}) * (1 - \frac{3}{n}) * \ldots * (1 - \frac{k - 2}{n}) * (1 - \frac{k - 1}{n})
+\end{align*}
+
+Given that $k$ is very large, and that $k$ is very small compared to $n$, we can surmise that n is very large. This means that the fractions 
+
+\begin{align*}
+P &= \frac{1}{n}, \frac{2}{n}, \frac{3}{n}, \ldots, \frac{k - 2}{n}, \frac{k - 1}{n}
+\end{align*}
+
+will all be very small positive values, since $n$ is defined as a positive integer. Therefore, we can apply the approximation:
+
+\begin{align*}
+e^{-x} &\approx 1 - x
+\end{align*}
+
+which applies when $x > 0$ is very small, to
+
+\begin{align*}
+P &= (1 - \frac{1}{n}) * (1 - \frac{2}{n}) * (1 - \frac{3}{n}) * \ldots * (1 - \frac{k - 2}{n}) * (1 - \frac{k - 1}{n})
+\end{align*}
+
+to obtain
+
+\begin{align*}
+P &\approx (e^{-\frac{1}{n}}) * (e^{-\frac{2}{n}}) * (e^{-\frac{3}{n}}) * \ldots * (e^{-\frac{k-2}{n}}) * (e^{-\frac{k-1}{n}}).
+\end{align*}
+
+Using power rules, we obtain:
+
+\begin{align*}
+P &\approx e^{-(1 + 2 + 3 + \ldots + (k - 2) + (k - 1)) / n}\\
+&= e^{-\frac{k (k - 1)}{n}}.
+\end{align*}
+
+Since $k$ is very large, we can use the approximation $k (k - 1) \approx k^2$. Applying this approximation, we get the result
+
+\begin{align*}
+P &\approx e^{-k^2 / n}.
+\end{align*}
+
+\item The result of part (g) is that the probability $P$ of all $k$ participants being assigned different numbers from a list of $n$ numbers can be approximated as $P \approx e^{\frac{-k^2}{2n}}$. We are asked
+to prove that the number of participants $k$ needed to ensure a roughly 50\% chance that all participants are assigned different numbers is approximately $1.177 \sqrt{n}$. Substituing $P = 0.50$, we can solve
+the approximately of part (f) to find $k$ as a function of $n$:
+
+\begin{align*}
+P &=  e^{\frac{-k^2}{2n}}\\
+0.50 &=  e^{\frac{-k^2}{2n}}\\
+ln(0.50) &= ln( e^{\frac{-k^2}{2n}})\\
+ln(0.50) &=  \frac{-k^2}{2n}\\
+-ln(0.50) * 2n &= k^2\\
+k  &= \sqrt{-ln(0.50) * 2n}\\
+k &= \sqrt{-ln(0.50) * 2} * \sqrt{n}\\
+k &= (1.1774 \ldots) \sqrt{n}\\
+k &\approx 1.177 \sqrt{n}
+\end{align*}
+
+From this, it can be seen that by using the approximation from part (g) we can represent the number of participants $k$ needed to ensure a rougly 50\% chance of all participants being assigned different numbers
+as a function of the amount of assignable numbers $n$: $k \approx 1.177 \sqrt{n}$.
+
 \end{enumerate}
 
 \newpage
 
 \item[] \textbf{Problem 4} --- Equiprobability maximizes entropy for two outcomes, 10 marks
 \begin{enumerate}
-\item
+\item If $p(X_1) = p = \frac{1}{8}$, and $p(X_2) = (1 - p) = \frac{7}{8}$, we can plug these values into the entropy equation to obtain a value for $H(X)$:
 
-\item
+\begin{align*}
+H(X) &= -p * log_2(p) - (1 - p) * log_2(1 - p)\\
+&= -\frac{1}{8} * log_2(\frac{1}{8}) - \frac{7}{8} *  log_2(\frac{7}{8})\\
+&= 0.5435 \ldots \\
+H(X) &\approx 0.54.
+\end{align*}
+
+\item 
 \item
 \end{enumerate}
 
