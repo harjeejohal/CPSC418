@@ -80,21 +80,24 @@ Therefore, the total number of password candidates is simply the sum of the numb
 \item The total number of passwords of length 8 that have at least one numerical digit and at least one special character can be computed by finding the number of passwords that
 violate this condition, and subtracting them from the total number of passwords of length 8.\\ 
 
-First, we compute the total number of passwords of length 8: $94^8$.\\
+First, we compute the total number of passwords of length 8: $94^8$. Let us represent this value with $n_t$.\\
 
 Next, we find the number of passwords of length 8 without a numerical digit in them. Since there are 10 numerical digits, the total number of passwords of length 8 that use none of them is:
-$(94-10)^8 = 84^8$.
+$(94-10)^8 = 84^8$. Let us represent this value as $n_n$
 
 Next, we find the number of passwords of length 8 without a special character in them. There are 32 special characters, so the number of passwords of length 8 
-that don't use them is: $(94-32)^8 = 62^8$.\\
+that don't use them is: $(94-32)^8 = 62^8$. Let us represent this value as $n_s$.\\
 
 Within these two computed subsets of the total passwords of length 8, we've double-counted a specific category. 
 Namely, we've double counted the total number of passwords of length 8 that have neither a numerical digit nor a special characer in them. 
 Therefore, to avoid these subset being subtracted from the total number of passwords of length 8 twice, it must be added once. The total number of passwords of 
-length 8 that don't use a numercal digit or a special character is $(94 - 32 - 10)^8 = 52^8$.\\ 
+length 8 that don't use a numercal digit or a special character is $(94 - 32 - 10)^8 = 52^8$. Let us represent this value as $n_{n,s}$.\\ 
 
-Combining all of this information together, we can compute the number of passwords of length 8 with at least one numerical digit and at least one special character as:\\ \\
-\textit{Total passwords} - \textit{passwords with no digits} - \textit{passwords with no special characters} + \textit{passwords with neither digits nor special characters}.\\
+Combining all of this information together, we can compute the number of passwords of length 8 with at least one numerical digit and at least one special character as:
+
+\begin{align*}
+n_t - n_n - n_s + n_{n,s}
+\end{align*}
 
 Substituting in the values that have been computed, we get $94^8 - 84^8 - 62^8 - 52^8$ passwords of length 8 that have at least one numerical digit and at least one special character.\\
 
@@ -107,37 +110,38 @@ Therefore, approximately 54.9\% of passwords satisfy the requirement in (c).\\
 \item (\textbf{Bonus}) In order to find the number of passwords of length 8 with at least one numerical digit and at least one special character and at least one uppercase letter, it is easier to find
 all of the passwords that violate this condition, and then subtract that from the total of passwords. We'll represent the number of passwords with at least one uppercase, at least one special character, and
 at least one numerical digit as $n_{target}$.\\
-The total number of passwords of length 8 using 94 printable characters is $94^8$. Let us represent this value as $n_{total}$.\\
+
+The total number of passwords of length 8 using 94 printable characters is $94^8$. Let us represent this value as $n_{t}$.\\
 
 Next, we must find the number of passwords of length 8 without any uppercase letters. There are 26 uppercase letters, so the total number of passwords of length 8 without an uppercase letter is $(94 - 26)^8 = 68^8$.
-We'll represent this value as $n_{uppercase}$.\\
+We'll represent this value as $n_{u}$.\\
 
-We must also find the number of passwords of length 8 without any special characters. This was computed in part (c) and found to be $62^8$. We'll represent this value as $n_{special}$.\\
+We must also find the number of passwords of length 8 without any special characters. This was computed in part (c) and found to be $62^8$. We'll represent this value as $n_{s}$.\\
 
-The next value to calculate is the number of passwords of length 8 without any numerical digits. This was also computed in part (c) and found to be $84^8$. We'll represent this value as $n_{numerical}$.\\
+The next value to calculate is the number of passwords of length 8 without any numerical digits. This was also computed in part (c) and found to be $84^8$. We'll represent this value as $n_{n}$.\\
 
-Also similarly to part (c), if we subtract $n_{uppercase}, n_{special}$, and $n_{numerical}$ from $n_{total}$, we'll end up subtracting passwords that fall into two of these categories twice. Namely,
-passwords that fall into both $n_{uppercase}$ and $n_{special}$, passwords that fall into both $n_{uppercase}$ and $n_{numerical}$, and passwords that fall into both $n_{special}$ and $n_{numerical}$ will end up
+Also similarly to part (c), if we subtract $n_{u}, n_{s}$, and $n_{n}$ from $n_{t}$, we'll end up subtracting passwords that fall into two of these categories twice. Namely,
+passwords that fall into both $n_{u}$ and $n_{s}$, passwords that fall into both $n_{u}$ and $n_{n}$, and passwords that fall into both $n_{s}$ and $n_{n}$ will end up
 being subtracted twice. In order to counter this, each of these subsets must be added back. Thus, we must compute the total number of passwords that fall into each of these subsets.\\
 
-The number of passwords of length 8 with neither an uppercase letter nor a special character is $(94 - 26 - 32)^8 = 34^8$. We'll represent this as $n_{uppercase, special}$.\\
+The number of passwords of length 8 with neither an uppercase letter nor a special character is $(94 - 26 - 32)^8 = 34^8$. We'll represent this as $n_{u, s}$.\\
 
-The number of passwords of length 8 with neither an uppercase letter nor a numerical digit is $(94 - 26 - 10)^8 = 58^8$. We'll represent this as $n_{uppercase, numerical}$.\\
+The number of passwords of length 8 with neither an uppercase letter nor a numerical digit is $(94 - 26 - 10)^8 = 58^8$. We'll represent this as $n_{u, n}$.\\
 
-The number of passwords of length 8 with neither an special character nor a numerical digit is $(94 - 32 - 10)^8 = 52^8$. We'll represent this as $n_{special, numerical}$.\\
+The number of passwords of length 8 with neither an special character nor a numerical digit is $(94 - 32 - 10)^8 = 52^8$. We'll represent this as $n_{s, n}$.\\
 
 With this, we have now accounted for the passwords that fall into two categories. However, there is one more category of passwords that hasn't been considered yet - passwords that have neither an uppercase letter
-nor a special character nor a numerical digit. Let us represent this value as $n_{uppercase,special,numerical}$. This subset is subtracted from the total count three times: once when $n_{uppercase}$ is subtracted from $n_{total}$,
-once when $n_{special}$ is subtracted from $n_{total}$, and once when $n_{numerical}$ is subtracted from $n_{total}$.\\
-$n_{uppercase,special,numerical}$ is also added back to $n_{total}$ three times: once when $n_{uppercase,special}$ is added back to $n_{total}$, once when $n_{uppercase,numerical}$ is added back to $n_{total}$, and
-once when $n_{special,numerical}$ is added back to $n_{total}$. Since $n_{uppercase,special,numerical}$ been subtracted three times and added three times, this subset is still present in the count of passwords
+nor a special character nor a numerical digit. Let us represent this value as $n_{u,s,n}$. This subset is subtracted from the total count three times: once when $n_{u}$ is subtracted from $n_{t}$,
+once when $n_{s}$ is subtracted from $n_{t}$, and once when $n_{n}$ is subtracted from $n_{t}$.\\
+$n_{u,s,n}$ is also added back to $n_{t}$ three times: once when $n_{u,s}$ is added back to $n_{t}$, once when $n_{u,n}$ is added back to $n_{t}$, and
+once when $n_{s,n}$ is added back to $n_{t}$. Since $n_{u,s,n}$ been subtracted three times and added three times, this subset is still present in the count of passwords
 with neither an uppercase letter nor a special character nor a numerical digit. Therefore, it must be subtracted one more time to be removed from this count.\\
 
-The value of $n_{uppercase,special,numerical}$ is $(94 - 26 - 32 - 10)  = 26^8$.\\
+The value of $n_{u,s,n}$ is $(94 - 26 - 32 - 10)  = 26^8$.\\
 
 Combining all of this information, we can compute $n_{target}$ as:
 \begin{align*}
-n_{target} &= n_{total} - n_{uppercase} - n_{special} - n_{numerical} + n_{uppercase,special} + n_{uppercase,numerical} + n_{special,numerical} - n_{uppercase,special,numerical}
+n_{target} &= n_{t} - n_{u} - n_{s} - n_{n} + n_{u,s} + n_{u,n} + n_{s,n} - n_{u,s,n}\\
 &= 94^8 - 68^8 - 62^8 - 84^8 + 34^8 + 58^8 + 52^8 - 26^8
 \end{align*}
 \\Therefore, the value of $n_{target}$ is $94^8 - 68^8 - 62^8 - 84^8 + 34^8 + 58^8 + 52^8 - 26^8$.\\
