@@ -185,14 +185,68 @@ of 19 would have a entropy below 128. Therefore the minimum password length that
 \item[] \textbf{Problem 3} --- Probabilities of Non-Collisions (26 marks)
 
 \begin{enumerate}
+\item If there are \textit{n} numbers, the chance of your favourite number \textit{N} being chosen is $1/n$.
+
+\item If there are \textit{n} numbers, the chance of your favourite number \textit{N} not being chosen is $(\textit{n} - 1)/ n$
+
+\item If there are \textit{n} numbers, and \textit{k} participants, the probability of none of the participants being assigned your favourite number \textit{N} is:
+\begin{align*}
+( \frac{n-1}{n})^k
+\end{align*}
+
+given that the assignment of numbers are independent events.
+
+\item In order to find the maximal value of \textit{k} when $n = 10$ such that the probability \textit{P} of your favourite number \textit{N} not being chosen is 50\%, we use:
+
+\begin{align*}
+( \frac{n-1}{n})^k \geq 0.50
+\end{align*}
+
+However, we know that as \textit{k} increases, the value of \textit{P} decreases. Therefore, we must solve for \textit{k} at the boundary where $P = 50$\%:
+
+\begin{align*}
+( \frac{n-1}{n})^k &= 0.50 \\
+( \frac{10-1}{10})^k &= 0.50 \\
+( \frac{9}{10})^k &= 0.50 \\
+log_2(0.90)^k &= log_2(0.50) \\
+k log_2(0.90) &= -1 \\
+k &= \frac{-1}{log_2(0.90)} \\
+k &= 6.5788\ldots \\
+k &\approx 6.58
+\end{align*}
+
+However, we cannot have such a thing as 6.58 participants. Since the value of $P$ decreases as $k$ increases, we must take the floor of k, 6, in order to ensure that the value
+of $P$ remains above 50\%. Therefore, the maximal number of participants this experiment can have to ensure at least a 50\% chance that none of the pariticipants are
+assigned your favourite number $N$, given that $n = 10$ is 6.
+
+\item If there are $k$ participants, and there are $n$ numbers that are to be independently assigned to the participants, the probabilty of them all receiving different numbers
+can be represented as a product of multiple events:
+
+\begin{align*}
+P_{unique} = P_{first pick unique} * P_{second pick unique} * \ldots * P_{k^{th} pick unique}
+\end{align*}
+
+The probability of the first participant choosing a unique number is 100\%, since no numbers have been assigned yet. The probability of the second participant choosing a unique
+number is the probability of them not choosing the same number as the first participant. The probability of the second participant choosing the same number as the first participant
+is $( \frac{1}{n})$, since only one number out of $n$ has been assigned. Therefore, the probability of them choosing a different number than the first probability is:
+
+\begin{align*}
+P_{second pick unique} = (1 - \frac{1}{n})
+\end{align*}
+
+The probability of the third participant choosing one of the numbers already assigned is $\frac{2}{n}$, since 2 of the $n$ numbers have been assigned. The probability of the third pariticipant
+choosing a different number than the first two participants is $(1 - \frac{2}{n})$.\\
+
+There is a pattern here, were the probability of the $i^{th}$ participant choosing a unique number is $(1 - \frac{i-1}{n})$. Using this information, we can define $P_{unique}$ as:
+
+
+
 \item
+
 \item
+
 \item
-\item
-\item
-\item
-\item
-\item
+
 \end{enumerate}
 
 \newpage
