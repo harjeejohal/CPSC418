@@ -19,8 +19,8 @@ ASSIGNMENT 1 }
 
 \hrule 	
 
-\textbf{Name:} Harjee Johal (replace by your name) \\
-\textbf{Student ID:} 30000668 (replace by your ID number)
+\textbf{Name:} Harjee Johal\\
+\textbf{Student ID:} 30000668
 
 \medskip \hrule
 
@@ -43,7 +43,7 @@ z_{i+m+1} &= c_{m-1} z_{i+m} + c_{m-2} z_{i+m-1} + \ldots + c_0 z_{i+1}\\
 z_{i+2m-2} &= c_{m-1} z_{i+2m-3} + c_{m-2} z_{i+2m-4} + \ldots + c_0 z_{i+m}\\
 z_{i+2m-1} &= c_{m-1} z_{i+2m-2} + c_{m-2} z_{i+2m-3} + \ldots + c_0 z_{i+m-1}\\
 \end{align*}
-\\ \\
+
 Since there are \textit{m} unknown coefficients $c_0, c_1, \ldots , c_{m-1}$, and we have \textit{m} equations utilizating these coefficients, we can generate a \textit{m} x \textit{m} matrix to solve for these coefficients.\\
 
 \item \emph {}
@@ -388,8 +388,68 @@ H(X) &= -p * log_2(p) - (1 - p) * log_2(1 - p)\\
 H(X) &\approx 0.54.
 \end{align*}
 
-\item 
-\item
+\item In order to find the maximal value of $H(X)$, you must find the critical points of the function. That is, you must find the value of $X$ when the derivative of $H(X)$
+is 0, $H'(X) = 0$.\\
+
+First, we must derive $H'(X)$:
+
+\begin{align*}
+H'(X) &= (-p * log_2(p) - (1 - p) * log_2(1 - p))'\\
+&= -(1 * log_2(p) + \frac{p}{p * ln(2)}) - (-1 * log_2(1 - p) + \frac{(1 - p)}{(1 - p) * ln(2) * -1})\\
+&= -(log_2(p) + \frac{1}{ln(2)}) - (-log_2(1 - p) - \frac{1}{ln(2)})\\
+&= -log_2(p) - \frac{1}{ln(2)} + log_2(1 - p) + \frac{1}{ln(2)}\\
+&= log_2(1 - p) - log_2(p)\\
+H'(X) &= log_2(\frac{1 - p}{p}).
+\end{align*}
+
+From this, we see that $H'(X) = log_2(\frac{1 - p}{p})$. Since both $p$ and $1 - p$ are defined as being positive, we don't need to worry about this derivative being undefined.
+Next, we set $H'(X) = 0$ and solve for $p$:
+
+\begin{align*}
+H'(X) &= 0\\
+0 &= log_2(\frac{1 - p}{p})\\
+2^0 &= \frac{1 - p}{p}\\
+p &= 1 - p\\
+2p &= 1\\
+p &= \frac{1}{2}.
+\end{align*}
+
+From this we identify $p = \frac{1}{2}$ as a critical point of $H(X)$. However, in order to determine whether $H(X)$ has a maximum value when $p = \frac{1}{2}$, we must perform a second derivative
+test. If the value of the second derivative is $> 0$ at the critical point, the function has a minimum value at that point. Else, if the second derivative is $< 0$ at the critical point, then that critical
+point is a maximum of the original function.\\
+
+First, we must find the second deriviative of $H(X)$, denoted by $H''(X)$. We know that $H'(X) = log_2(1 - p) - log_2(p)$. Therefore, $H''(X)$ is:
+
+\begin{align*}
+H''(X) &= (log_2(1 - p) - log_2(p))'\\
+&= \frac{-1}{(1 - p) * ln(2)} - \frac{1}{p * ln(2)}
+\end{align*}
+
+Next, we substitute in $p = \frac{1}{2}$ into $H''(X)$ in order to perform the second derivative test:
+
+\begin{align*}
+H''(X) &= \frac{-1}{(1 - p) * ln(2)} - \frac{1}{p * ln(2)}\\
+H''(X) &= \frac{-1}{(1 - \frac{1}{2}) * ln(2)} - \frac{1}{\frac{1}{2} * ln(2)}\\
+H''(X) &= -2.7725\ldots \\
+H''(X) &< 0.
+\end{align*}
+
+Since $H''(X)$ is less than 0 when $p = \frac{1}{2}$, and $H'(X) = 0$ when $p = \frac{1}{2}$, that means that $H(X)$ has a maxiumum value when $p = \frac{1}{2}$.\\
+
+When $p = \frac{1}{2}$, the value of $p(X_1) = p = \frac{1}{2}$, and the value of $p(X_2) = 1 - p = 1 - \frac{1}{2} = \frac{1}{2}$. Therefore, when H(X) has a maximum value, $p(X_1) = p(X_2)$.
+
+\item $H(X)$ has a maximal value when $p = \frac{1}{2}$. If we substitute $p = \frac{1}{2}$ into $H(X)$, we find that the maximal value is:
+
+\begin{align*}
+H(X) &= -p * log_2(p) - (1 - p) * log_2(1 - p)\\
+&= -(\frac{1}{2}) * log_2(\frac{1}{2}) - (1 - \frac{1}{2}) * log_2(1 - \frac{1}{2})\\
+&= -(\frac{1}{2}) * (-1) - (\frac{1}{2}) * log_2(\frac{1}{2})\\
+&= (\frac{1}{2}) - (\frac{1}{2}) * (-1)\\
+H(X) &= 1
+\end{align*}
+
+Thus, the maximal value of $H(X)$ is 1.
+
 \end{enumerate}
 
 \newpage
