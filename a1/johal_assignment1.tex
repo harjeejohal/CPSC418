@@ -37,16 +37,58 @@ ASSIGNMENT 1 }
 \\ \\
 to generate the following system of \textit{m} equations:\\ \\
 \begin{align*}
-z_{i+m} &= c_{m-1} z_{i+m-1} + c_{m-2} z_{i+m-2} + \ldots + c_0 z_i\\
-z_{i+m+1} &= c_{m-1} z_{i+m} + c_{m-2} z_{i+m-1} + \ldots + c_0 z_{i+1}\\
+z_{i+m} &\equiv c_{m-1} z_{i+m-1} + c_{m-2} z_{i+m-2} + \ldots + c_0 z_i \qquad &\mod{2}\\
+z_{i+m+1} &\equiv c_{m-1} z_{i+m} + c_{m-2} z_{i+m-1} + \ldots + c_0 z_{i+1} \qquad &\mod{2}\\
 &\ldots \\
-z_{i+2m-2} &= c_{m-1} z_{i+2m-3} + c_{m-2} z_{i+2m-4} + \ldots + c_0 z_{i+m}\\
-z_{i+2m-1} &= c_{m-1} z_{i+2m-2} + c_{m-2} z_{i+2m-3} + \ldots + c_0 z_{i+m-1}\\
+z_{i+2m-2} &\equiv c_{m-1} z_{i+2m-3} + c_{m-2} z_{i+2m-4} + \ldots + c_0 z_{i+m} \qquad &\mod{2}\\
+z_{i+2m-1} &\equiv c_{m-1} z_{i+2m-2} + c_{m-2} z_{i+2m-3} + \ldots + c_0 z_{i+m-1} \qquad &\mod{2}
 \end{align*}
 
 Since there are \textit{m} unknown coefficients $c_0, c_1, \ldots , c_{m-1}$, and we have \textit{m} equations utilizating these coefficients, we can generate a \textit{m} x \textit{m} matrix to solve for these coefficients.\\
 
-\item \emph {}
+\item We already told that $m = 4$, and that the sequence $(1, 1, 1, 1, 0, 0, 1, 1)$ was generated using one. Let us refer to this sequence as $(z_0, z_1, z_2, z_3, z_4, z_5, z_6, z_7)$. We can build the following system of equations (?):
+
+\begin{align*}
+z_4 &\equiv c_3  z_3 + c_2  z_2 + c_1  z_1 + c_0  z_0 \qquad &\mod{2}\\
+z_5 &\equiv c_3  z_4 + c_2  z_3 + c_1  z_2 + c_0  z_1 \qquad &\mod{2}\\
+z_6 &\equiv c_3  z_5 + c_2  z_4 + c_1  z_3 + c_0  z_2 \qquad &\mod{2}\\
+z_7 &\equiv c_3  z_6 + c_2  z_5 + c_1  z_4 + c_0  z_3 \qquad &\mod{2}
+\end{align*}
+
+Since the values of $z_0, z_1, \ldots , z_7$ are known, we can substitute them into these equations to get:
+
+\begin{align*}
+0 &\equiv c_3 + c_2 + c_1 + c_0 \qquad &\mod{2}\\
+0 &\equiv c_2 + c_1 + c_0 \qquad &\mod{2}\\
+1 &\equiv c_1 + c_0 \qquad &\mod{2}\\
+1 &\equiv c_3 + c_0 \qquad &\mod{2}
+\end{align*}
+
+We can use these values to construct a matrix $M$, which can be use to solve for the coefficients $c_0, c_1, c_2, c_3$:
+
+\[
+  M=
+  \left[ {\begin{array}{cccc | c}
+   1 & 1 & 1 & 1 & 0\\
+   0 & 1 & 1 & 1 & 0\\
+   0 & 0 & 1 & 1 & 1\\
+   1 & 0 & 0 & 1 & 1\\
+  \end{array} } \right]
+\]
+
+Since $c_0, c_1, c_2, c_3 \in \{0 , 1\}$, we must take $\mod{2}$ of the values determined from $M$, in order to ensure that the calculated coefficients are $\in \{0, 1\}$.\\
+
+Solving $M$, we find that:
+
+\begin{align*}
+c_0 &= &1 &\mod{2} &= 1\\
+c_1 &= &0 &\mod{2} &= 0\\
+c_2 &= &-1 &\mod{2} &= 1\\
+c_3 &= &0 &\mod{2} &= 0
+\end{align*}
+
+Therefore, using the method from (b) we find that $(c_0, c_1, c_2, c_3) = (1, 0, 1, 0)$.
+
 \end{enumerate}
 
 \newpage
