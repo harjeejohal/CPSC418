@@ -141,11 +141,11 @@ Combining all of this information together, we can compute the number of passwor
 n_t - n_n - n_s + n_{n,s}
 \end{align*}
 
-Substituting in the values that have been computed, we get $94^8 - 84^8 - 62^8 - 52^8$ passwords of length 8 that have at least one numerical digit and at least one special character.\\
+Substituting in the values that have been computed, we get $94^8 - 84^8 - 62^8 + 52^8$ passwords of length 8 that have at least one numerical digit and at least one special character.\\
 
 \item The percentage of 8-character passwords that satisfy the requirements of part (c) is simply a ratio of the value computed in the previous question, and the total number of passwords
 of length 8:\\
-\centerline{$(94^8 - 84^8 - 62^8 - 52^8)/94^8 = 0.5487698\ldots \approx 54.9\%.$}\\
+\centerline{$(94^8 - 84^8 - 62^8 + 52^8)/94^8 = 0.5487698\ldots \approx 56.6\%.$}\\
 
 Therefore, approximately 54.9\% of passwords satisfy the requirement in (c).\\
 
@@ -166,7 +166,7 @@ Also similarly to part (c), if we subtract $n_{u}, n_{s}$, and $n_{n}$ from $n_{
 passwords that fall into both $n_{u}$ and $n_{s}$, passwords that fall into both $n_{u}$ and $n_{n}$, and passwords that fall into both $n_{s}$ and $n_{n}$ will end up
 being subtracted twice. In order to counter this, each of these subsets must be added back. Thus, we must compute the total number of passwords that fall into each of these subsets.\\
 
-The number of passwords of length 8 with neither an uppercase letter nor a special character is $(94 - 26 - 32)^8 = 34^8$. We'll represent this as $n_{u, s}$.\\
+The number of passwords of length 8 with neither an uppercase letter nor a special character is $(94 - 26 - 32)^8 = 36^8$. We'll represent this as $n_{u, s}$.\\
 
 The number of passwords of length 8 with neither an uppercase letter nor a numerical digit is $(94 - 26 - 10)^8 = 58^8$. We'll represent this as $n_{u, n}$.\\
 
@@ -186,7 +186,7 @@ Combining all of this information, we can compute $n_{target}$ as:
 n_{target} &= n_{t} - n_{u} - n_{s} - n_{n} + n_{u,s} + n_{u,n} + n_{s,n} - n_{u,s,n}\\
 &= 94^8 - 68^8 - 62^8 - 84^8 + 34^8 + 58^8 + 52^8 - 26^8
 \end{align*}
-\\Therefore, the value of $n_{target}$ is $94^8 - 68^8 - 62^8 - 84^8 + 34^8 + 58^8 + 52^8 - 26^8$.\\
+\\Therefore, the value of $n_{target}$ is $94^8 - 68^8 - 62^8 - 84^8 + 36^8 + 58^8 + 52^8 - 26^8$.\\
 
 \item If each permissable character in a password is chosen with equal likelihood, that means that each password in that password space is chosen with equal likelihood. Therefore,
 the entropy of the password space is $log_2(n)$, where \textit{n} is the number of passwords in the password space.\\
