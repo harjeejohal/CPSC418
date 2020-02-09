@@ -12,7 +12,8 @@ from cryptography.hazmat.primitives import padding
 target_substring = b'FOXHOUND'
 
 
-# This method attempts to decrypt the cipher text with the password passed in. Returns the plaintext upon success
+# This method attempts to decrypt the cipher text with the password passed in. Returns the plaintext upon success, and
+# throws an exception upon an incorrect decryption
 def test_key(file_content, key, iv):
     # Hash the password using SHA1, and then truncates it to 16-bytes to be used in AES decryption
     digest = hashes.Hash(hashes.SHA1(), backend=default_backend())
@@ -39,10 +40,11 @@ if len(args) < 2:
 
 file_name = args[1]
 
+# Reads the ciphertext file in as bytes
 with open(file_name, 'rb') as f_handle:
     file_contents = f_handle.read()
 
-# First 16 bytes of the file are the IV used for CBC mode during encryption
+# First 16 bytes of the file are the 16-byte initial value used for CBC mode with the AES-CBC-128 cipher
 initial_value = file_contents[:16]
 
 # Since Bob's passwords are important dates in his life, and he was born in 1984, the earliest important date in his
@@ -51,8 +53,11 @@ start_date = date(1984, 1, 1)
 # We cannot assume which days are important to Bob, so we must check all values up to and including the current day
 end_date = date.today()
 
+# The increment that we iterate by through the days between start_date and end_date
 day_delta = timedelta(days=1)
 
+# This loop iterates through all dates starting from January 1st, 1984 to the current day. For each day, it generates
+# a YYYYMMDD date string, which is as an a potential key for decrypting the ciphertext
 for day in range((end_date - start_date).days):
     try:
         potential_key = (start_date + day_delta * day).strftime('%Y%m%d')
@@ -74,8 +79,11 @@ unpadded_pt += unpadder.finalize()
 # we get the plaintext byte array with the concatenated hash tag removed
 original_pt = unpadded_pt[:-20]
 
+# Converted the plaintext byte array into a string. This string is then checked for the substring 'CODE-RED', which is
+# then replaced with 'CODE-BLUE' if it exists
 pt_string = bytes(original_pt).decode('utf-8')
 tampered_pt = pt_string.replace('CODE-RED', 'CODE-BLUE')
 
+# Writes the decrypted/ potentially modified plaintext to an output file specified as a command-line argument
 with open('modifyFile_output.txt', 'w') as f_handle:
     f_handle.write(tampered_pt)
