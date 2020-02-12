@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 
-# This substring exists in all of Bob's plaintext messages, so this is the substring we use to verify that our chosen
+# This substring exists in all of Bob's plaintext messages, so this is the substring we use to verify if our chosen
 # key is correct
 target_substring = b'FOXHOUND'
 
@@ -50,6 +50,7 @@ initial_value = file_contents[:16]
 # Since Bob's passwords are important dates in his life, and he was born in 1984, the earliest important date in his
 # life would be his birthday, which could be January 1, 1984 at the earliest.
 start_date = date(1984, 1, 1)
+
 # We cannot assume which days are important to Bob, so we must check all values up to and including the current day
 end_date = date.today()
 
@@ -57,7 +58,7 @@ end_date = date.today()
 day_delta = timedelta(days=1)
 
 # This loop iterates through all dates starting from January 1st, 1984 to the current day. For each day, it generates
-# a YYYYMMDD date string, which is as an a potential key for decrypting the ciphertext
+# a YYYYMMDD date string, which is used as a potential key for decrypting the ciphertext
 for day in range((end_date - start_date).days):
     try:
         potential_key = (start_date + day_delta * day).strftime('%Y%m%d')
@@ -66,7 +67,7 @@ for day in range((end_date - start_date).days):
     except:
         continue
 
-# Removes the IV from the plain_text
+# Removes the 16-byte initial value from the plain_text
 plain_text = plain_text[16:]
 
 # Removes padding
@@ -79,7 +80,7 @@ unpadded_pt += unpadder.finalize()
 # we get the plaintext byte array with the concatenated hash tag removed
 original_pt = unpadded_pt[:-20]
 
-# Converted the plaintext byte array into a string. This string is then checked for the substring 'CODE-RED', which is
+# Converts the plaintext byte array into a string. This string is then checked for the substring 'CODE-RED', which is
 # then replaced with 'CODE-BLUE' if it exists
 pt_string = bytes(original_pt).decode('utf-8')
 tampered_pt = pt_string.replace('CODE-RED', 'CODE-BLUE')
