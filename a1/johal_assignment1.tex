@@ -35,7 +35,7 @@ ASSIGNMENT 1 }
 \item We can use linear recurrence (1) provided in the question, along with the known sequence: \\ \\
 \centerline{$z_{i}, z_{i+1}, \ldots , z_{i+2m-1}$}
 \\ \\
-to generate the following system of \textit{m} equations:\\ \\
+to generate the following system of \textit{m} congruencies:\\ \\
 \begin{align*}
 z_{i+m} &\equiv c_{m-1} z_{i+m-1} + c_{m-2} z_{i+m-2} + \ldots + c_0 z_i \qquad &\mod{2}\\
 z_{i+m+1} &\equiv c_{m-1} z_{i+m} + c_{m-2} z_{i+m-1} + \ldots + c_0 z_{i+1} \qquad &\mod{2}\\
@@ -44,9 +44,10 @@ z_{i+2m-2} &\equiv c_{m-1} z_{i+2m-3} + c_{m-2} z_{i+2m-4} + \ldots + c_0 z_{i+m
 z_{i+2m-1} &\equiv c_{m-1} z_{i+2m-2} + c_{m-2} z_{i+2m-3} + \ldots + c_0 z_{i+m-1} \qquad &\mod{2}
 \end{align*}
 
-Since there are \textit{m} unknown coefficients $c_0, c_1, \ldots , c_{m-1}$, and we have \textit{m} equations utilizating these coefficients, we can generate a \textit{m} x \textit{m} matrix to solve for these coefficients.\\
+Since there are \textit{m} unknown coefficients $c_0, c_1, \ldots , c_{m-1}$, and we have \textit{m} congruencies utilizating these coefficients, we can build an $m$ x $m$ matrix to solve for each coefficient. However, this approach relies on each of these congruencies
+being linearly independent. Otherwise, there are less than $m$ distinct equations, meaning that not all $m$ coefficients can be solved for.
 
-\item We already told that $m = 4$, and that the sequence $(1, 1, 1, 1, 0, 0, 1, 1)$ was generated using one. Let us refer to this sequence as $(z_0, z_1, z_2, z_3, z_4, z_5, z_6, z_7)$. We can build the following system of equations (?):
+\item We already told that $m = 4$, and that the sequence $(1, 1, 1, 1, 0, 0, 1, 1)$ was generated using one. Let us refer to this sequence as $(z_0, z_1, z_2, z_3, z_4, z_5, z_6, z_7)$. We can build the following system of congruencies(?):
 
 \begin{align*}
 z_4 &\equiv c_3  z_3 + c_2  z_2 + c_1  z_1 + c_0  z_0 \qquad &\mod{2}\\
@@ -55,7 +56,7 @@ z_6 &\equiv c_3  z_5 + c_2  z_4 + c_1  z_3 + c_0  z_2 \qquad &\mod{2}\\
 z_7 &\equiv c_3  z_6 + c_2  z_5 + c_1  z_4 + c_0  z_3 \qquad &\mod{2}
 \end{align*}
 
-Since the values of $z_0, z_1, \ldots , z_7$ are known, we can substitute them into these equations to get:
+Since the values of $z_0, z_1, \ldots , z_7$ are known, we can substitute them into these congruencies to get:
 
 \begin{align*}
 0 &\equiv c_3 + c_2 + c_1 + c_0 \qquad &\mod{2}\\
@@ -76,16 +77,8 @@ We can use these values to construct a matrix $M$, which can be use to solve for
   \end{array} } \right]
 \]
 
-Since $c_0, c_1, c_2, c_3 \in \{0 , 1\}$, we must take $\mod{2}$ of the values determined from $M$, in order to ensure that the calculated coefficients are $\in \{0, 1\}$.\\
-
-Solving $M$, we find that:
-
-\begin{align*}
-c_0 &= &1 &\mod{2} &= 1\\
-c_1 &= &0 &\mod{2} &= 0\\
-c_2 &= &-1 &\mod{2} &= 1\\
-c_3 &= &0 &\mod{2} &= 0
-\end{align*}
+Next, we must solve this matrix. Suppose that $c_0 = 1$. Then that means that $c_3$ must equal 0, since $c_3 + c_0 \equiv 1 \mod{2}$. If $c_0 = 1$, then $c_1 = 0$, since $c_1 + c_0 \equiv 1 \mod{2}$. Given that $c_0 = 1$ and $c_1 = 0$, then $c_2$ must equal 1,
+since $c_2 + c_1 + c_0 \equiv 0 \mod{2}$. We can verifiy that $(c_0, c_1, c_2, c_3) = (1, 0, 1, 0)$ by verifiying that $c_3 + c_2 + c_1 + c_0 \equiv 0 \mod{2}$. Substituting in the derived coefficients, we find that $c_3 + c_2 + c_1 + c_0 = 0 + 1 + 0 + 1 \equiv 0 \ mod{2}$.
 
 Therefore, using the method from (b) we find that $(c_0, c_1, c_2, c_3) = (1, 0, 1, 0)$.
 
