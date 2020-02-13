@@ -1,5 +1,8 @@
 #!/usr/bin python
 
+# Name: Harjee Johal
+# File name: encryptFile.py
+
 import os
 import sys
 from cryptography.hazmat.backends import default_backend
@@ -54,5 +57,5 @@ cipher_text = encryptor.update(padded_byte_array) + encryptor.finalize()
 
 # Encrypted text is then written to a file
 with open(output_file, 'wb') as f_handle:
-    f_handle.write(bytes(initial_value, 'utf-8'))
-    f_handle.write(bytes(cipher_text, 'utf-8'))
+    f_handle.write(bytes(initial_value))
+    f_handle.write(bytes(cipher_text))
