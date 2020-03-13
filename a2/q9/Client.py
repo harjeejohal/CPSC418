@@ -20,6 +20,8 @@ def setup_server_connection(user, pword):
         s.sendall(b'Hello World')
         data = s.recv(1024)
         print('Received', repr(data))
+        data = s.recv(1024)
+        print('Received', repr(data))
 
 
 username, password = get_user_input()
