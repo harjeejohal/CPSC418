@@ -3,6 +3,7 @@ import os
 from sympy import isprime
 import socket
 import random
+import secrets
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
@@ -56,16 +57,16 @@ def setup_client_connection(n_prime, primitive_root):
         print('Server is up')
         print('Server: N = %d' % n_prime)
         print('Server: g = %d' % primitive_root)
-        hex_prime = bytes(n_prime.to_bytes(64, byteorder='big')).hex()
-        hex_root = bytes(primitive_root.to_bytes(64, byteorder='big')).hex()
         soc.bind((HOSTNAME, PORT))
         soc.listen()
         conn, addr = soc.accept()
         with conn:
-            print('Server: Sending N <%s>' % hex_prime)
-            print('Server: Sending g <%s>' % hex_root)
-            conn.sendall(bytes(hex_prime, 'utf-8'))
-            conn.sendall(bytes(hex_root, 'utf-8'))
+            bytes_prime = bytes(n_prime.to_bytes(64, byteorder='big'))
+            bytes_root = bytes(primitive_root.to_bytes(64, byteorder='big'))
+            print('Server: Sending N <%s>' % bytes_prime.hex())
+            print('Server: Sending g <%s>' % bytes_root.hex())
+            conn.sendall(bytes_prime)
+            conn.sendall(bytes_root)
 
             r = conn.recv(1).decode('utf-8')
             i_size = int(conn.recv(8), 16)
@@ -115,25 +116,10 @@ def setup_client_connection(n_prime, primitive_root):
             conn.sendall(bytes(hex_server_key, 'utf-8'))
 
 
-def verify_candidate(candidate, sophie_prime, prime):
-    test_two = int((prime - 1) / 2)
-    test_sophie = int((prime - 1) / sophie_prime)
-
-    if pow(candidate, test_two, prime) == 1 or pow(candidate, test_sophie, prime) == 1:
-        return -1
-    else:
-        return candidate
-
-
 def find_primitive_root(sophie_prime, prime):
-    prime_minus_one = prime - 1
     for num in range(1, prime):
-        if pow(num, prime_minus_one, prime) == 1:
-            root = verify_candidate(num, sophie_prime, prime)
-            if root == -1:
-                continue
-            else:
-                return root
+        if pow(num, 2, prime) != 1 and pow(num, sophie_prime, prime) != 1:
+            return num
 
     return -1
 
@@ -141,10 +127,11 @@ def find_primitive_root(sophie_prime, prime):
 def initial_values():
     n_prime_not_found = True
     while n_prime_not_found:
-        test_prime_hex = os.urandom(64).hex()
-        test_prime_bin = bin(int(test_prime_hex, 16))[:-3]
-        test_prime_bin = '0b1' + test_prime_bin[2:] + '1'
-        test_prime = int(test_prime_bin, 2)
+        test_prime = secrets.randbits(511)
+        # Makes sure that the number is odd and that the 511th bit isn't randomly set to 0
+        test_prime |= 1
+        test_prime |= (1 << 510)
+
         is_prime = isprime(test_prime)
 
         if is_prime:
