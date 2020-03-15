@@ -1,5 +1,6 @@
 Name: Harjee Johal
 UCID: 30000668
+CPSC 418 - Assignment 2
 
 I believe that my choices of using os.urandom() to generate the salt, and the usage of secrets.randbits() and
 secrets.randbelow() are valid. The reason is because none of these methods are pseudo-random (deterministic). In a pseudo-random
@@ -31,6 +32,11 @@ N - 1. Since N is of the form 2 * prime + 1, that means N - 1 = 2 * prime. There
 that need to be tested are 2 and the original prime that was used to generate N. If the candidate primitive root passes
 the check for both prime factors, then it's used as g, and our candidate value of N becomes the value we use for N. 
 Else, if no primitive root can be found, the whole process is started again from the top, and another 511-bit value is generated.
+
+
+The files included are: 
+	- Server.py, which contains all of the logic for the server-side during registration/authentication
+	- Client.py, which contains all of the logic for the client-side during registration/authentication
 
 
 The problem is solved in full, and passed the auto-grader.
