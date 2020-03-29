@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-import os
 from sympy import isprime
 import socket
-
 import secrets
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 
 # Name: Harjee Johal
 # UCID: 30000668
+# CPSC 418 - Assignment 2
 
 # Used for the socket
 HOSTNAME = '127.0.4.18'

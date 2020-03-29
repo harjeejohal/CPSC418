@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives import hashes
 
 # Name: Harjee Johal
 # UCID: 30000668
+# CPSC 418 - Assignment 2
 
 HOSTNAME = '127.0.4.18'
 PORT = 31802
@@ -123,6 +124,7 @@ def setup_server_connection(user, password):
         primitive_root = int.from_bytes(primitive_root, 'big')
 
         x, v = calculate_key_with_hash(salt, password, n_prime, primitive_root)
+        del x
 
         flush_output("Client: Sending 'r' <%s>" % bytes('r', 'utf-8').hex())
         s.sendall(bytes('r', 'utf-8'))

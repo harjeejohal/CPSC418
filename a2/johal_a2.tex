@@ -95,7 +95,7 @@ If $j = 1$, then $y^i = y^j = y^1 = y$. Therefore, when we multiply $a(y)$ with 
 Using the fact that in this arithmetic $y^4 = 1$, we can reduce this equation to:
 
 \begin{align*}
-    a(y) * y &= a_3 + a_2y^3 + a_1y^2 + a_0y
+    a(y) * y &= a_3 + a_2y^3 + a_1y^2 + a_0y\\
     &= a_2y^3 + a_1y^2 + a_0y + a_3.
 \end{align*}
 
@@ -147,11 +147,11 @@ From this, we can see that the statement holds for all cases. Therefore, the sta
 \item \begin{enumerate}
 \item In the Rijndahl field GF($2^8)$, the bytes (01), (02), and (03) are, respectively:
 \begin{align*}
-    c_1(x) = 1\\
-    c_2(x) = x\\
-    c_3(x) = x+1.
+    c_1(x) &= 1\\
+    c_2(x) &= x\\
+    c_3(x) &= x+1.
 \end{align*} 
-\\
+
 
 \item From the previous part, we know that the Rijndahl representation of (02) is $c_2(x) = x$. The representation of \textit{b} in the Rijndahl field GF($2^8$), $b(x)$, is:
 
@@ -168,7 +168,7 @@ Therefore, the value of $d = (02)b$ in the Rijndahl field can be computed as:
     &= b_7x^8 + b_6x^7 + b_5x^6 + b_4x^5 + b_3x^4 + b_2x^3 + b_1x^2 + b_0x.
 \end{align*}
 
-We are told that in this field, arithmetic is done modulo $m(x)$, where $m(x) = x^8 + x^4 + x^3 + x + 1$. We can use the fact that the modulus for a given modular arithmetic is always zero for the corresponding modular arithmetic to determine that $m(x) = 0$, since $m(x)$ is the modulus that corresponds to the Rijndahl field GF($2^8$). Since $m(x) = 0 = x^8 + x^4 + x^3 + x + 1$, we find that $x^8 = x^4 + x^3 + x + 1$ in this field. We can substitute this into the expression determined for $d = (02)b$ to obtain:
+We are told that in this field, arithmetic is done modulo $m(x)$, where $m(x) = x^8 + x^4 + x^3 + x + 1$. Since all math in this field is done modulo $m(x)$, it stands to reason that $m(x) = 0$ in this field, since $m(x) \mod{m(x)} = 0$. Since $m(x) = 0 = x^8 + x^4 + x^3 + x + 1$, we find that $x^8 = x^4 + x^3 + x + 1$ in this field. We can substitute this into the expression determined for $d = (02)b$ to obtain:
 
 \begin{align*}
     d(x) &= b_7x^8 + b_6x^7 + b_5x^6 + b_4x^5 + b_3x^4 + b_2x^3 + b_1x^2 + b_0x \\
@@ -396,7 +396,7 @@ Therefore, at the end of our approach, we find that $r_3 = 61$. Therefore, this 
 \begin{enumerate}
 \item In this question, we are asked to prove that $s_i = \sum_{j=0}^i b_j2^{i-j}$ for $0 \leq i \leq k$, given that $s_0 = 1$ and $s_{i+1} = 2s_i + b_{i+1}$ for $0 \leq i \leq k - 1$. We shall prove this using induction. \\
 
-\textbf{Base Case i = 0:} If $i = 0$, then $s_0 = 1$, as defined in the problem.\\
+\textbf{Base Case i = 0:} If $i = 0$, then $s_0 = \sum_{j=0}^{0} b_j2^{i-j} = b_02^{0 - 0} = b_02^0 = b_0$. In the description of the exponentiation algorithm, the value of $b_0$ is defined as being $b_0 = 1$. Therefore, $s_0 = b_0 = 1$. This matches the value that we defined for $s_0$ in the question. Thus, the base case has been verified.\\
 
 \textbf{Inductive Hypothesis:} Suppose that $s_i = \sum_{j=0}^i b_j2^{i-j}$ for $0 \leq i \leq k - 1$. \\
 
@@ -437,7 +437,7 @@ Since we have proven that $r_{i+1} \equiv a^{s_{i+1}}$, in both cases, the state
 
 This expression for $s_k$ perfectly matches step one of the exponentiation algorithm, where the exponent $n$ in the expression $a^n \mod{m}$ is written in the form: $n = b_02^k + b_12^{k-1} + \ldots + b_{k-1}2 + b_k$. From this, we can conclude that $s_k = n$. \\
 
-Next, in part (ii), we proved that $r_i \equiv a^{s_i}$ for $0 \leq i \leq k$. If we set $i = k$, we can see that $r_k = a^{s_k} \mod{m}$. Earlier, we found that $s_k = n$. If we substitute this equality in, we see that $r_k \equiv a^n \mod{m}$. This can be re-written as $a^n \equiv r_k \mod{m}$, since modulo arithmetic is symmetrical. Thus, we have proven that $a^n \equiv r_k \mod{m}$, thereby verifying that the exponentiation algorithm does compute $a^n \mod{m}$ like it claims.
+Next, in part (ii), we proved that $r_i \equiv a^{s_i}$ for $0 \leq i \leq k$. If we set $i = k$, we can see that $r_k = a^{s_k} \mod{m}$. Earlier, we found that $s_k = n$. If we substitute this equality in, we see that $r_k \equiv a^n \mod{m}$. This can be re-written as $a^n \equiv r_k \mod{m}$. Thus, we have proven that $a^n \equiv r_k \mod{m}$, thereby verifying that the exponentiation algorithm does compute $a^n \mod{m}$ like it claims.
 
 \end{enumerate}
 \end{enumerate}
@@ -449,15 +449,25 @@ Next, in part (ii), we proved that $r_i \equiv a^{s_i}$ for $0 \leq i \leq k$. I
     (10 marks)
 
 \begin{enumerate}
-\item Mallory sends Alice $(g^b)^q \mod{m}$. She then computes $Key_{Alice}$ as $((g^b)^q)^a \mod{m} = g^{abq} \mod{m}$. Therefore, $Key_{Alice} = g^{abq}$. \\
+\item Mallory sends Alice $(g^b)^q \mod{m}$. She then computes $Key_{Alice}$ as $((g^b)^q)^a \mod{m} = g^{abq} \mod{m}$. Therefore, $Key_{Alice} = g^{abq} \mod{m}$. \\
 
-Mallory sends Bob $(g^a)^q \mod{m}$. He then computes $Key_{Bob}$ as $((g^a)^q)^b \mod{m} = g^{abq} \mod{m}$. Therefore, $Key_{Bob} = g^{abq}$. \\
+Mallory sends Bob $(g^a)^q \mod{m}$. He then computes $Key_{Bob}$ as $((g^a)^q)^b \mod{m} = g^{abq} \mod{m}$. Therefore, $Key_{Bob} = g^{abq} \mod{m}$. \\
 
 From this, we can see that $Key_{Alice} = Key_{Bob}$. Therefore, both Alice and Bob end up calculating the same shared key.
 
-\item 
+\item In this question, we are asked to demonstrate that  in the case of Mallory's attack, there are only $m$ possible values for $K$. \\
 
-\item In the man-in-the-middle attack discussed in lecture, there are two shared keys: $g^{ea} \mod{m}$, which is shared between Alice and Mallory, and then there is $g^{eb} \mod{m}$, which is shared between Mallory and Bob. In this scenario, Mallory has to intercept any messages sent by Alice, decrypt them using the key shares with Alice, and then re-encrypt the message with the key she shares with Bob. If she fails to do this a single message, then Alice and Bob may notice that there is an interceptor. The reason is because Alice and Bob don't have a shared key with each other. This means that if Alice gets a message directly to Bob without Mallory intercepting it, Bob won't be able to decrypt it. Therefore, this may indicate to them that something suspicious is happening. This approach requires much more effort from Mallory, since she can't afford to miss a single message, lest she be found out. \\
+In the question, we are told that $p$ is prime, and that $g$ is a primitive root of $p$. Thus, by Fermat's Little Theorem, we know that $g^{p-1} \equiv 1 \mod{p}$. Furthermore, we are told that $p = mq + 1$, where $q$ is also a prime number, and $m$ is noted as being very small. We can rearrange this equation to obtain $mq = p-1$. 
+\\
+From the previous part, we know that the shared key between Alice and Bob, $K$, can be represented by $g^{abq} \equiv K \mod{p}$. Mallory herself knows both $g^{aq} \mod{p}$ and $g^{bq} \mod{p}$, and is trying to find $g^{abq} \mod{p}$. Suppose she chooses to try finding it using the known value $g^{aq} \mod{p}$. Let the integer $k$, $k \geq 0$, represent the candidate values for $b$. Using this, we get: $g^{kaq} \mod{p}$, $k \geq 0$.\\ \\
+When $k = 0$, this expression becomes $g^{kaq} \equiv g^{0} \equiv 1 \mod{p}$.\\
+When $k = 1$, this expression becomes $g^{kaq} \equiv g^{aq} \mod{p}$.\\
+When $k = 2$, this expression becomes $g^{kaq} \equiv g^{2aq} \mod{p}$.\\
+\centerline{\vdots} \\
+Suppose we follows trends all the up to $k = m$. Then we get $g^{maq} \equiv K \mod{p}$. This can be re-arranged to get $(g^{mq})^a \equiv K \mod{p}$. However, we know that $mq = p - 1$ from above, meaning this can be re-written into $(g^{p - 1})^a \equiv K \mod{p}$. Since $g$ is a primitive root of $p$, we know from Fermat's Little Theorem that $g^{p - 1} \equiv 1 \mod{p}$. That means that $(g^{p-1})^a \mod{p}$ can be replaced with $1^a \mod{p}$, which is equivalent to $1 \mod{p}$. Therefore, when $k = m$, the expression can be reduced to $1 \equiv K \mod{p}$. This is identical to the expression we got for $k = 0$. Furthermore, for each subsequent value of $k$ ($k = m + 1$, $k = m + 2$, $k = m +3$ \ldots), there will always be a multiple of $m$ within the value, which can be extracted and then reduced to 1 via Fermat's Little Theorem. The portion of $k$ that remains after this process will be some value $r$ such that we get $g^r \mod{p} $, $0 \leq r \leq m - 1$, which all have computed values already. Therefore, Mallory only needs to test $m$ values to find $K$. Since $m$ is known to be small, that means there aren't many numbers to test.
+\\
+
+\item In the man-in-the-middle attack discussed in lecture, there are two shared keys: $g^{ea} \mod{m}$, which is shared between Alice and Mallory, and then there is $g^{eb} \mod{m}$, which is shared between Mallory and Bob. In this scenario, Mallory has to intercept every message sent by Alice, decrypt it using the key she shares with Alice, and then re-encrypt the message with the key she shares with Bob, and vice versa for the messages that Bob sends. If she fails to do this a single message, then Alice and Bob may notice that there is an interceptor. The reason is because Alice and Bob don't have a shared key with each other. This means that if Alice gets a message directly to Bob without Mallory intercepting it, Bob won't be able to decrypt it. Therefore, this may indicate to them that something suspicious is happening. This approach requires much more effort from Mallory, since she can't afford to miss a single message, lest she be found out. \\
 
 In comparison, the attack explored in this question is far more passive. Mallory doesn't need to worry about intercepting every message, because Alice and Bob \textit{do} share a key in this case. Therefore, even if Mallory misses intercepting a message, the recipient can still decrypt it successfully. This greatly reduces the chances of her being caught.
 
@@ -472,55 +482,19 @@ In comparison, the attack explored in this question is far more passive. Mallory
 \begin{enumerate}
 \item By the end of this procedure, $K_{Client} \equiv B^{a+p} \mod{N}$. However, we know from step 1 of the protocol that $B \equiv g^b \mod{N}$. Therefore, we can re-write $K_{Client}$ as $(g^b)^{a+p} \equiv \mod{N}$. This can be expanded out to obtain: $K_{Client} \equiv g^{ab + bp} \mod{N}$. \\
 
-By the end of this procedure, $K_{Server} \equiv (Av)^{b} \mod{N}$. However, we know from the question's description of the protocol that $v \equiv g^p \mod{N}$. We also know from step one that $A \equiv g^a \mod{N}$. Therefore, we can re-write $K_{Server}$ as $(g^ag^p)^b \equiv \mod{N}$. This can be expanded out to obtain: $K_{Client} \equiv (g^{a + p})^b \mod{N} \equiv g^{ab + bp} \mod{N}$. Therefore, $K_{Server} = g^{ab + bp} \mod{N}$. \\
+By the end of this procedure, $K_{Server} \equiv (Av)^{b} \mod{N}$. However, we know from the question's description of the protocol that $v \equiv g^p \mod{N}$. We also know from step one that $A \equiv g^a \mod{N}$. Therefore, we can re-write $K_{Server}$ as $K_{Server} \equiv (g^ag^p)^b \mod{N}$. This can be expanded out to obtain: $K_{Server} \equiv (g^{a + p})^b \mod{N} \equiv g^{ab + bp} \mod{N}$. Therefore, $K_{Server} = g^{ab + bp} \mod{N}$. \\
 
 From this, we can see that $K_{Client} \equiv g^{ab + bp} \mod{N}$, and that $K_{Server} \equiv g^{ab + bp} \mod{N}$. Therefore, $K_{Client} = K_{Server}$.
+\\
+\item Suppose that the value $v$ is known by a malicious user. Let us then choose $a = (N - 2)p$ for our value. If we do this, then $A \equiv g^{(N - 2)p} \mod{N}$. Since $g$ is a primitive root of $N$, that means that $g^{N - 1} \equiv 1 \mod{N}$ according to Fermat's Little Theorem. We can write $a = (N - 1 - 1)p = (N - 1)p - p$. Thus, we can see that $A \equiv g^{(N-1)p - p} \mod{N}$. Using exponent rules, this can be written as $A \equiv (g^{N-1})^p * g^{-p} \mod{N}$. Since $g^{N-1} \equiv 1 \mod{N}$, This becomes $A \equiv (1)^p * g^{-p} \mod{N} \equiv g^{-p} \mod{N}$. Thus, $A \equiv g^{-p} \mod{N}$. The server computes $K_{Server}$ as $(Av)^b \mod{N}$. Since the value of $A$ being sent over is $g^{-p} \mod {N}$. This computation becomes $((g^{-p})v)^b \mod{N}$. Since $v \equiv g^p \mod{N}$, this can be re-written as: $(g^{-p} * g^p) \mod{N}$. Using exponent rules, this becomes $g^{-p + p} \mod{N} = g^0 \mod{N} = 1 \mod{N}$. Therefore, $K_{Server} \equiv 1 \mod{N}$.\\
 
-\item 
+The client calculates its key, $K_{Client}$, using $K_{Client} \equiv (B)^{a + p} \mod{N}$. Since we've defined $a = (N - 1)p - p$, we can re-write this as: $K_{Client} \equiv (B)^{(N - 1)p - p + p} \mod{N} \equiv (B)^{(N - 1)p} \mod{N}$. Since $K_{Client} \equiv (B)^{(N - 1)p} \mod{N}$, equation becomes $K_{Client} \equiv (g^b)^{(N - 1)p} \mod{N}$. This can be re-arranged to get: $K_{Client} \equiv (g^{N - 1})^{bp} \mod{N}$. Since $g$ is a primitive root of $N$, that means that $g^{N-1} \equiv 1 \mod{N}$, by Fermat's Little Theorem. Therefore, this equation can be turned into $K_{Client} \equiv (1)^{bp} \mod{N} \equiv 1 \mod{N}$. Thus, $K_{Client} \equiv 1 \mod{N}$. This matches the value of $K_{Server}$. Thus, we have shown that with knowledge of $v$, we can always select a value of $A$ such that we can successfully masquerade as the client.
+\\
 
-\item
+\item For this question, we are asked to prove that a user who can solve any instance of the key recovery problem for the protocol above can also solve any instance of the Diffie-Hellman problem as well. Suppose a user can solve the key recovery problem above. That means that they can find any shared key of the form $K = g^{ab + bp}$.\\
+
+The Diffie-Hellman protocol generates a shared key of the form $K = g^{ab}$. If we compare a Diffie-Hellman key to the one generated by the protocol laid out in this question, we can see that the Diffie-Hellman key is just an instance of form $g^{ab + bp}$ where $p = 0$ ($g^{ab + b(0)} = g^{ab + 0} = g^{ab}$). Therefore, since the user can find any shared key of the form $g^{ab + bp}$, and the Diffie-Hellman problem generates a shared key of the form $g^{ab + bp}$ where $p = 0$, it stands to reason that the user can also solve the Diffie-Hellman problem.
 \end{enumerate}
-
-
-\newpage
-
-\stepcounter{problem}
-\item[] \textbf{Problem \theproblem} --- Primitive roots for safe primes (6 marks)
-
-\newpage
-
-\stepcounter{problem}
-\item[] \textbf{Problem \theproblem} --- Discrete logarithms with respect to different primitive
-    roots (8 marks)
-
-\newpage
-
-\stepcounter{problem}
-\item[] \textbf{Problem \theproblem} --- An algorithm for extracting discrete logarithms (21
-    marks)
-
-\begin{enumerate}
-\item
-
-\item
-
-\item
-
-\item
-
-\item
-    \begin{enumerate}
-    \item
-
-    \item
-\end{enumerate}
-\end{enumerate}
-
-\newpage
-
-\stepcounter{problem} \stepcounter{problem}
-
-\item[] \textbf{Problem \theproblem} --- Playfair cipher cryptanalysis, 10 marks
 
 \end{enumerate}
 
