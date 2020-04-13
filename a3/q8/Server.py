@@ -1,0 +1,309 @@
+#!/usr/bin/env python3
+
+import sys
+from math import gcd
+from sympy import isprime
+from random import randint
+import socket
+import secrets
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+
+# Name: Harjee Johal
+# UCID: 30000668
+# CPSC 418 - Assignment 3
+
+# Used for the socket
+HOSTNAME = '127.0.4.18'
+TTS_PORT = 31802
+CLIENT_PORT = 31803
+
+
+def flush_output(message_contents):
+    print('Server: %s' % message_contents, flush=True)
+
+
+def hash_value(input_val):
+    digest = hashes.Hash(hashes.SHA3_256(), backend=default_backend())
+    digest.update(input_val)
+    return digest.finalize()
+
+
+def compute_e(phi_n):
+    upper_bound = phi_n - 1
+    while True:
+        e_candidate = randint(1, upper_bound)
+        if gcd(e_candidate, phi_n) == 1:
+            return e_candidate
+
+
+def find_safe_prime():
+    while True:
+        test_prime = secrets.randbits(511)
+        test_prime |= 1
+        test_prime |= (1 << 510)
+
+        if isprime(test_prime):
+            candidate_safe_prime = 2 * test_prime + 1
+
+            if isprime(candidate_safe_prime):
+                return candidate_safe_prime
+
+
+def calculate_rsa_parameters():
+    p = find_safe_prime()
+    q = find_safe_prime()
+    while p == q:
+        q = find_safe_prime()
+
+    flush_output('Server_p = %d' % p)
+    flush_output('Server_q = %d' % q)
+
+    n = p * q
+    phi_n = (p - 1) * (q - 1)
+    flush_output('Server_N = %d' % n)
+
+    e = compute_e(phi_n)
+    d = pow(e, -1, phi_n)
+
+    flush_output('Server: Server_e = %d' % e)
+    flush_output('Server: Server_d = %d' % d)
+
+    return p, q, n, e, d
+
+
+def get_server_name():
+    print('Server name: ')
+    name_raw = sys.stdin.readline().strip()
+    server_name = name_raw.encode('utf-8')
+
+    return server_name
+
+
+def get_ttp_sig(server_name, n, e):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
+        flush_output('Server is running')
+        soc.bind((HOSTNAME, TTS_PORT))
+        soc.listen()
+        conn, addr = soc.accept()
+        with conn:
+            request_sign_bytes = bytes('REQUEST SIGN', 'utf-8')
+            flush_output("Server: Sending 'REQUEST SIGN' = <%s>" % request_sign_bytes.hex())
+            conn.sendall(request_sign_bytes)
+
+            name_size = len(server_name)
+            name_size_bytes = name_size.to_bytes(4, byteorder='big')
+            name_bytes = bytes(server_name, 'utf-8')
+            flush_output('Server: Sending len(Server_name) = <%s>' % name_size_bytes.hex())
+            flush_output('Server: Sending Server_name = <%s>' % name_bytes.hex())
+
+            conn.sendall(name_size_bytes)
+            conn.sendall(name_bytes)
+
+            n_bytes = n.to_bytes(128, byteorder='big')
+            e_bytes = e.to_bytes(128, byteorder='big')
+            server_pk = n_bytes + e_bytes
+
+            flush_output('Server: Sending Server_PK = <%s>' % server_pk.hex())
+            conn.sendall(server_pk)
+
+            ttp_n = int.from_bytes(conn.recv(128), 'big')
+            ttp_sig = int.from_bytes(conn.recv(128), 'big')
+
+            flush_output('Server: Receiving TTP_N = %d' % ttp_n)
+            flush_output('Server: Receiving TTP_SIG = %d' % ttp_sig)
+
+            return ttp_n, ttp_sig
+
+
+def find_primitive_root(n):
+    q = (n - 1) / 2
+    for num in range(1, n):
+        if pow(num, 2, n) != 1 and pow(num, q, n) != 1:
+            return num
+
+    return -1
+
+
+def find_n_and_g():
+    while True:
+        n = find_safe_prime()
+        g = find_primitive_root(n)
+
+        if g != -1:
+            return n, g
+
+
+def calculate_big_b(params_dict):
+    n_prime = params_dict['n']
+    primitive_root = params_dict['g']
+    v = params_dict['v']
+
+    b = secrets.randbelow(n_prime - 1)
+
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(n_prime.to_bytes(64, 'big'))
+    digest.update(primitive_root.to_bytes(64, 'big'))
+    hashed_val = digest.finalize()
+
+    k = int.from_bytes(hashed_val, 'big')
+    summation = pow(primitive_root, b, n_prime) + k * v
+
+    big_b = summation % n_prime
+
+    flush_output('Server: Server_b = %d' % b)
+
+    flush_output('Server: Server_k = %d' % k)
+
+    flush_output('Server: Server_B = %d' % big_b)
+
+    return big_b, b
+
+
+def decrypt_rsa(ciphertext, params_dict):
+    d = params_dict['d']
+    server_n = params_dict['server_n']
+
+    return int(pow(ciphertext, d, server_n))
+
+
+def compute_u(big_a, big_b, n):
+    hash_input = big_a.to_bytes(64, byteorder='big') + big_b.to_bytes(64, byteorder='big')
+    return int.from_bytes(hash_value(hash_input), 'big')
+
+
+def compute_server_key(params_dict, big_a, big_b, b):
+    n = params_dict['n']
+    u = compute_u(big_a, big_b, n)
+    flush_output('Server: u = %d' % u)
+
+    u_b = u * b
+    base_one = pow(big_a, b, n)
+    base_two = pow(params_dict['v'], u_b, n)
+
+    return (base_one * base_two) % n
+
+
+def generate_m1(big_a, big_b, server_key):
+    digest = hashes.Hash(hashes.SHA3_256(), backend=default_backend())
+    digest.update(big_a.to_bytes(64, byteorder='big'))
+    digest.update(big_b.to_bytes(64, byteorder='big'))
+    digest.update(server_key.to_bytes(64, byteorder='big'))
+
+    return digest.finalize()
+
+
+def calculate_m2(big_a, m1_server, server_key):
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(big_a.to_bytes(64, byteorder='big'))
+    digest.update(m1_server)
+    digest.update(server_key.to_bytes(64, byteorder='big'))
+
+    return digest.finalize()
+
+
+def connect_to_client(params_dict):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
+        flush_output('Server is running')
+        flush_output('Server: N = %d' % params_dict['n'])
+        flush_output('Server: g = %d' % params_dict['g'])
+        soc.bind((HOSTNAME, CLIENT_PORT))
+        soc.listen()
+        while True:
+            conn, addr = soc.accept()
+            with conn:
+                n_bytes = params_dict['n'].to_bytes(64, byteorder='big')
+                g_bytes = params_dict['g'].to_bytes(64, byteorder='big')
+
+                flush_output('Server: Sending N = <%s>' % n_bytes.hex())
+                flush_output('Server: Sending g = <%s>' % g_bytes.hex())
+                conn.sendall(n_bytes)
+                conn.sendall(g_bytes)
+
+                flag = conn.recv(1).decode('utf-8')
+                if flag == 'r':
+                    i_size = int.from_bytes(conn.recv(4), 'big')
+                    flush_output('Server: Receiving len(Client_name) = %d' % i_size)
+
+                    i = conn.recv(i_size).decode('utf-8')
+
+                    flush_output("Server: Receiving Client_name = '%s'" % i)
+
+                    salt = conn.recv(16)
+                    flush_output('Server: Receiving Client_salt = <%s>' % salt.hex())
+
+                    v = int.from_bytes(conn.recv(64), 'big')
+                    flush_output('Server: Receiving Client_v = %d' % v)
+
+                    params_dict.update({'v': v, 's': salt, 'I': i})
+
+                    server_name = params_dict['server_name']
+                    name_length = len(server_name).to_bytes(4, byteorder='big')
+                    server_name_bytes = bytes(server_name, 'utf-8')
+                    server_pk = params_dict['server_n'].to_bytes(128, byteorder='big') + params_dict['e'] \
+                        .to_bytes(128, byteorder='big')
+                    sig_bytes = params_dict['ttp_sig'].to_bytes(128, byteorder='big')
+
+                    flush_output("Server: Sending Server_name = <%s>" % server_name_bytes.hex())
+                    flush_output('Server: Sending len(Server_name) = <%s>' % name_length.hex())
+                    flush_output('Server: Sending Server_PK = <%s>' % server_pk.hex())
+                    flush_output('Server: Sending TTP_SIG = <%s>' % sig_bytes.hex())
+
+                    conn.sendall(name_length)
+                    conn.sendall(server_name_bytes)
+                    conn.sendall(server_pk)
+                    conn.sendall(sig_bytes)
+
+                elif flag == 'p':
+                    big_b, b = calculate_big_b(params_dict)
+                    client_name_length = int.from_bytes(conn.recv(4), 'big')
+                    client_name = conn.recv(client_name_length).decode('utf-8')
+                    big_a_rsa = int.from_bytes(conn.recv(128), 'big')
+                    big_a = decrypt_rsa(big_a_rsa, params_dict)
+
+                    flush_output('Server: Receiving len(Client_name) = %d' % client_name_length)
+                    flush_output('Server: Receiving Client_name = %d' % client_name)
+                    flush_output('Server: Receiving Enc(A) = %d' % big_a_rsa)
+
+                    if big_a % params_dict['n'] == 0:
+                        flush_output('Server: Invalid A')
+                        break
+
+                    flush_output('Server: Sending s = <%s>' % params_dict['s'].hex())
+                    conn.sendall(params_dict['s'])
+
+                    big_b_bytes = big_b.to_bytes(128, 'big')
+                    flush_output('Server: Sending B = <%s>' % big_b_bytes.hex())
+                    conn.sendall(big_b_bytes)
+
+                    server_key = compute_server_key(params_dict, big_a, big_b, b)
+                    flush_output('Server: k_server = %d' % server_key)
+
+                    m1 = conn.recv(32)
+                    flush_output('Server: Receiving Client_M1 = <%s>' % m1.hex())
+
+                    m1_server = generate_m1(big_a, big_b, server_key)
+                    if m1 == m1_server:
+                        flush_output('Server: Negotiation successful')
+
+                        m2 = calculate_m2(big_a, m1_server, server_key)
+                        flush_output('Server: Server_M2 = <%s>' % m2.hex())
+                        flush_output('Server: Sending Server_M2 = <%s>' % m2.hex())
+                        conn.sendall(m2)
+
+                    else:
+                        flush_output('Server: Negotiation unsuccessful')
+
+                conn.close()
+
+
+def main():
+    filename = sys.argv[1]
+    server_name = get_server_name()
+    p, q, server_n, e, d = calculate_rsa_parameters()
+
+    ttp_n, ttp_sig = get_ttp_sig(server_name, server_n, e)
+    n, g = find_n_and_g()
+    params_dict = dict(p=p, q=q, server_n=server_n, e=e, d=d, ttp_n=ttp_n, ttp_sig=ttp_sig, n=n, g=g, name=server_name)
+
+    connect_to_client(params_dict)
