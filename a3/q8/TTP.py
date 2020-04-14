@@ -48,6 +48,19 @@ def find_safe_prime():
                 return candidate_safe_prime
 
 
+def find_inverse(a, b):
+    if a == 0:
+        return b, 0, 1
+    g, y, x = find_inverse(b % a, a)
+
+    return g, x - (b // a) * y, y
+
+
+def compute_d(e, phi_n):
+    g, x, y = find_inverse(e, phi_n)
+    return x % phi_n
+
+
 def calculate_rsa_parameters():
     p = find_safe_prime()
     q = find_safe_prime()
@@ -62,7 +75,7 @@ def calculate_rsa_parameters():
     flush_output('TTP: TTP_N = %d' % n)
 
     e = compute_e(phi_n)
-    d = pow(e, -1, phi_n)
+    d = compute_d(e, phi_n)
 
     flush_output('TTP: TTP_e = %d' % e)
     flush_output('TTP: TTP_d = %d' % d)
@@ -75,7 +88,7 @@ def rsa_decrypt(message, d, n):
 
 
 def compute_ttp_sig(n, d, name, server_pk):
-    concat_val = name + server_pk
+    concat_val = bytes(name, 'utf-8') + server_pk
     t = hash_value(concat_val)
     t_prime = hash_value(t)
 
@@ -94,16 +107,20 @@ def setup_socket(p, q, n, e, d):
             conn, addr = soc.accept()
             with conn:
                 request_type = conn.recv(12).decode('utf-8').strip()
-                flush_output('TTP: Receiving %s' % request_type)
+                flush_output("TTP: Receiving '%s'" % request_type)
                 if request_type == 'REQUEST SIGN':
                     name_size = int.from_bytes(conn.recv(4), 'big')
-                    flush_output('TTP: Receiving len(Server_name) = %d' % name_size)
+                    flush_output('TTP: Receiving len(S) = %d' % name_size)
 
                     name = conn.recv(name_size).decode('utf-8')
-                    flush_output('TTP: Receiving Server_name = %s' % name)
+                    flush_output('TTP: Receiving S = %s' % name)
 
-                    server_pk = conn.recv(256)
-                    flush_output('TTP: Receiving Server_PK = %s' % server_pk.hex())
+                    server_n_bytes = conn.recv(128)
+                    server_e_bytes = conn.recv(128)
+                    flush_output('TTP: Receiving Server_N = %d' % int.from_bytes(server_n_bytes, 'big'))
+                    flush_output('TTP: Receiving Server_e = %d' % int.from_bytes(server_e_bytes, 'big'))
+
+                    server_pk = server_n_bytes + server_e_bytes
 
                     ttp_sig = compute_ttp_sig(n, d, name, server_pk)
                     flush_output('TTP: TTP_SIG = %d' % ttp_sig)
@@ -121,8 +138,13 @@ def setup_socket(p, q, n, e, d):
                     e_bytes = e.to_bytes(128, byteorder='big')
 
                     ttp_pk = n_bytes + e_bytes
-                    flush_output('TTP: Sending TTP_PK = <%s>' % ttp_pk.hex())
+                    flush_output('TTP: Sending TTP_N = <%s>' % n_bytes.hex())
+                    flush_output('TTP: Sending TTP_e = <%s>' % e_bytes.hex())
                     conn.sendall(ttp_pk)
+
+                    conn.close()
+                    soc.close()
+                    break
 
 
 def main():
