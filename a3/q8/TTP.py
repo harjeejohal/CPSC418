@@ -88,7 +88,7 @@ def rsa_decrypt(message, d, n):
 
 
 def compute_ttp_sig(n, d, name, server_pk):
-    concat_val = bytes(name, 'utf-8') + server_pk
+    concat_val = name + server_pk
     t = hash_value(concat_val)
     t_prime = hash_value(t)
 
@@ -107,13 +107,12 @@ def setup_socket(p, q, n, e, d):
             conn, addr = soc.accept()
             with conn:
                 request_type = conn.recv(12).decode('utf-8').strip()
-                flush_output("TTP: Receiving '%s'" % request_type)
                 if request_type == 'REQUEST SIGN':
                     name_size = int.from_bytes(conn.recv(4), 'big')
                     flush_output('TTP: Receiving len(S) = %d' % name_size)
 
-                    name = conn.recv(name_size).decode('utf-8')
-                    flush_output('TTP: Receiving S = %s' % name)
+                    name_bytes = conn.recv(name_size)
+                    flush_output('TTP: Receiving S = %s' % name_bytes.decode('utf-8'))
 
                     server_n_bytes = conn.recv(128)
                     server_e_bytes = conn.recv(128)
@@ -122,7 +121,7 @@ def setup_socket(p, q, n, e, d):
 
                     server_pk = server_n_bytes + server_e_bytes
 
-                    ttp_sig = compute_ttp_sig(n, d, name, server_pk)
+                    ttp_sig = compute_ttp_sig(n, d, name_bytes, server_pk)
                     flush_output('TTP: TTP_SIG = %d' % ttp_sig)
 
                     n_bytes = n.to_bytes(128, byteorder='big')
