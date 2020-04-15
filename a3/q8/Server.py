@@ -51,6 +51,20 @@ def find_safe_prime():
                 return candidate_safe_prime, test_prime
 
 
+def egcd(a, b):
+    if a == 0:
+        return b, 0, 1
+    else:
+        g, y, x = egcd(b % a, a)
+        return g, x - (b // a) * y, y
+
+
+def compute_d(e, phi_n):
+    g, x, y = egcd(e, phi_n)
+
+    return x % phi_n
+
+
 def calculate_rsa_parameters():
     p, _ = find_safe_prime()
     q, _ = find_safe_prime()
@@ -65,7 +79,7 @@ def calculate_rsa_parameters():
     flush_output('Server_N = %d' % n)
 
     e = compute_e(phi_n)
-    d = pow(e, -1, phi_n)
+    d = compute_d(e, phi_n)
 
     flush_output('Server: Server_e = %d' % e)
     flush_output('Server: Server_d = %d' % d)
@@ -200,7 +214,7 @@ def generate_hmac(aes_key, file_bytes):
 
 def decrypt_ciphertext(ciphertext_bytes, server_key, filename):
     key_bytes = server_key.to_bytes(64, byteorder='big')
-    aes_key = key_bytes[:32]
+    aes_key = hash_value(key_bytes)
     iv = ciphertext_bytes[:16]
     ciphertext = ciphertext_bytes[16:]
 

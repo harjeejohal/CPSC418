@@ -112,7 +112,7 @@ def setup_socket(p, q, n, e, d):
                     flush_output('TTP: Receiving len(S) = %d' % name_size)
 
                     name_bytes = conn.recv(name_size)
-                    flush_output('TTP: Receiving S = %s' % name_bytes.decode('utf-8'))
+                    flush_output("TTP: Receiving S = %s" % name_bytes.decode('utf-8'))
 
                     server_n_bytes = conn.recv(128)
                     server_e_bytes = conn.recv(128)

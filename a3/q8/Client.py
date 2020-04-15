@@ -136,7 +136,7 @@ def generate_hmac(aes_key, file_bytes):
 
 def encrypt_file(params_dict, client_key):
     key_bytes = client_key.to_bytes(64, byteorder='big')
-    aes_key = key_bytes[:32]
+    aes_key = hash_value(key_bytes, hashes.SHA3_256())
     iv = os.urandom(16)
     filename = params_dict['filename']
     with open(filename, 'rb') as f_handle:
