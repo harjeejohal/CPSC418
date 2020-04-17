@@ -22,7 +22,7 @@ def flush_output(message_contents):
 
 
 def hash_value(input_val):
-    digest = hashes.Hash(hashes.SHA512(), backend=default_backend())
+    digest = hashes.Hash(hashes.SHA3_512(), backend=default_backend())
     digest.update(input_val)
     return digest.finalize()
 
@@ -107,17 +107,21 @@ def setup_socket(p, q, n, e, d):
             conn, addr = soc.accept()
             with conn:
                 request_type = conn.recv(12).decode('utf-8').strip()
+                flush_output("TTP: Receiving '%s'" % request_type)
                 if request_type == 'REQUEST SIGN':
                     name_size = int.from_bytes(conn.recv(4), 'big')
                     flush_output('TTP: Receiving len(S) = %d' % name_size)
 
                     name_bytes = conn.recv(name_size)
-                    flush_output("TTP: Receiving S = %s" % name_bytes.decode('utf-8'))
+                    flush_output("TTP: Receiving S = '%s'" % name_bytes.decode('utf-8'))
 
                     server_n_bytes = conn.recv(128)
                     server_e_bytes = conn.recv(128)
                     flush_output('TTP: Receiving Server_N = %d' % int.from_bytes(server_n_bytes, 'big'))
                     flush_output('TTP: Receiving Server_e = %d' % int.from_bytes(server_e_bytes, 'big'))
+
+                    flush_output('TTP: Server_N = %d' % int.from_bytes(server_n_bytes, 'big'))
+                    flush_output('TTP: Server_e = %d' % int.from_bytes(server_e_bytes, 'big'))
 
                     server_pk = server_n_bytes + server_e_bytes
 
