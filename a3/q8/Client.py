@@ -34,7 +34,7 @@ def calculate_x(salt, password):
 
 
 def rsa_encrypt(message, e, n):
-    return int(pow(message, e, n))
+    return pow(message, e, n)
 
 
 def check_signature(params_dict):
@@ -43,8 +43,8 @@ def check_signature(params_dict):
     server_e_bytes = params_dict['server_e'].to_bytes(128, byteorder='big')
 
     hash_input = bytes(server_name, 'utf-8') + server_n_bytes + server_e_bytes
-    t = hash_value(hash_input, hashes.SHA512())
-    t_prime = hash_value(t, hashes.SHA512())
+    t = hash_value(hash_input, hashes.SHA3_512())
+    t_prime = hash_value(t, hashes.SHA3_512())
 
     ttp_n = params_dict['ttp_n']
     ttp_e = params_dict['ttp_e']
@@ -83,7 +83,7 @@ def calculate_client_key(big_a, big_b, x, v, a, n_prime, primitive_root):
     base = big_b - k * v
     exponent = u * x + a
 
-    return int(pow(base, exponent, n_prime))
+    return pow(base, exponent, n_prime)
 
 
 # This is used to get the password and username from the user during registration
@@ -185,7 +185,7 @@ def perform_registration(params_dict):
 
         flush_output('Client: Receiving N = %d' % n_prime)
         flush_output('Client: Receiving g = %d' % primitive_root)
-        v = int(pow(primitive_root, x, n_prime))
+        v = pow(primitive_root, x, n_prime)
 
         flush_output("Client: Sending 'r' = <%s>" % bytes('r', 'utf-8').hex())
         s.sendall(bytes('r', 'utf-8'))
@@ -261,7 +261,7 @@ def perform_protocol(params_dict):
         flush_output('Client: Receiving B = %d' % big_b)
 
         x = calculate_x(salt, params_dict['pw'])
-        v = int(pow(g, x, n))
+        v = pow(g, x, n)
 
         client_key = calculate_client_key(big_a, big_b, x, v, a, n, g)
 

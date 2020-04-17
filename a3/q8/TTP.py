@@ -2,6 +2,7 @@
 
 from math import gcd
 from sympy import isprime
+from sympy.core.numbers import mod_inverse
 from random import randint
 import socket
 import secrets
@@ -48,19 +49,6 @@ def find_safe_prime():
                 return candidate_safe_prime
 
 
-def find_inverse(a, b):
-    if a == 0:
-        return b, 0, 1
-    g, y, x = find_inverse(b % a, a)
-
-    return g, x - (b // a) * y, y
-
-
-def compute_d(e, phi_n):
-    g, x, y = find_inverse(e, phi_n)
-    return x % phi_n
-
-
 def calculate_rsa_parameters():
     p = find_safe_prime()
     q = find_safe_prime()
@@ -75,7 +63,7 @@ def calculate_rsa_parameters():
     flush_output('TTP: TTP_N = %d' % n)
 
     e = compute_e(phi_n)
-    d = compute_d(e, phi_n)
+    d = mod_inverse(e, phi_n)
 
     flush_output('TTP: TTP_e = %d' % e)
     flush_output('TTP: TTP_d = %d' % d)
@@ -84,7 +72,7 @@ def calculate_rsa_parameters():
 
 
 def rsa_decrypt(message, d, n):
-    return int(pow(message, d, n))
+    return pow(message, d, n)
 
 
 def compute_ttp_sig(n, d, name, server_pk):
@@ -92,7 +80,8 @@ def compute_ttp_sig(n, d, name, server_pk):
     t = hash_value(concat_val)
     t_prime = hash_value(t)
 
-    t_int = int.from_bytes((t + t_prime), 'big')
+    t_bytes = t + t_prime
+    t_int = int.from_bytes(t_bytes, 'big')
     reduced_t_int = t_int % n
 
     return rsa_decrypt(reduced_t_int, d, n)
@@ -106,14 +95,22 @@ def setup_socket(p, q, n, e, d):
         while True:
             conn, addr = soc.accept()
             with conn:
-                request_type = conn.recv(12).decode('utf-8').strip()
+                request_type_init = conn.recv(11).decode('utf-8')
+                if request_type_init == 'REQUEST SIG':
+                    request_type_last_byte = conn.recv(1).decode('utf-8')
+                    request_type = request_type_init + request_type_last_byte
+                else:
+                    request_type = request_type_init
+
                 flush_output("TTP: Receiving '%s'" % request_type)
                 if request_type == 'REQUEST SIGN':
+                    flush_output('Random print statement')
                     name_size = int.from_bytes(conn.recv(4), 'big')
                     flush_output('TTP: Receiving len(S) = %d' % name_size)
 
                     name_bytes = conn.recv(name_size)
                     flush_output("TTP: Receiving S = '%s'" % name_bytes.decode('utf-8'))
+                    flush_output("TTP: S = '%s'" % name_bytes.decode('utf-8'))
 
                     server_n_bytes = conn.recv(128)
                     server_e_bytes = conn.recv(128)
@@ -134,7 +131,8 @@ def setup_socket(p, q, n, e, d):
                     flush_output('TTP: Sending TTP_N = <%s>' % n_bytes.hex())
                     flush_output('TTP: Sending TTP_SIG = <%s>' % sig_bytes.hex())
 
-                    conn.sendall(n_bytes + sig_bytes)
+                    conn.sendall(n_bytes)
+                    conn.sendall(sig_bytes)
 
                 elif request_type == 'REQUEST KEY':
                     n_bytes = n.to_bytes(128, byteorder='big')

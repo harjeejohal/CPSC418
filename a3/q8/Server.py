@@ -76,7 +76,7 @@ def calculate_rsa_parameters():
 
     n = p * q
     phi_n = (p - 1) * (q - 1)
-    flush_output('Server_N = %d' % n)
+    flush_output('Server: Server_N = %d' % n)
 
     e = compute_e(phi_n)
     d = compute_d(e, phi_n)
@@ -263,13 +263,13 @@ def connect_to_client(params_dict):
 
                     i = conn.recv(i_size).decode('utf-8')
 
-                    flush_output("Server: Receiving I = '%s'" % i)
+                    flush_output("Server: I = '%s'" % i)
 
                     salt = conn.recv(16)
-                    flush_output('Server: Receiving s = <%s>' % salt.hex())
+                    flush_output('Server: s = <%s>' % salt.hex())
 
                     v = int.from_bytes(conn.recv(64), 'big')
-                    flush_output('Server: Receiving v = %d' % v)
+                    flush_output('Server: v = %d' % v)
 
                     params_dict.update({'v': v, 's': salt, 'i': i})
 
@@ -297,7 +297,7 @@ def connect_to_client(params_dict):
                     big_a = decrypt_rsa(big_a_rsa, params_dict)
 
                     flush_output('Server: Receiving len(I) = %d' % client_name_length)
-                    flush_output('Server: Receiving I = %s' % client_name)
+                    flush_output("Server: Receiving I = '%s'" % client_name)
                     flush_output('Server: Receiving Enc(A) = %d' % big_a_rsa)
 
                     if big_a % params_dict['n'] == 0:
@@ -319,12 +319,14 @@ def connect_to_client(params_dict):
                     flush_output('Server: Receiving M1 = <%s>' % m1.hex())
 
                     m1_server = generate_m1(big_a, big_b, server_key)
+                    flush_output('Server: M1 = <%s>' % m1_server.hex())
+
                     if m1 == m1_server:
                         flush_output('Server: Negotiation successful')
 
                         m2 = calculate_m2(big_a, m1_server, server_key)
-                        flush_output('Server: Server_M2 = <%s>' % m2.hex())
-                        flush_output('Server: Sending Server_M2 = <%s>' % m2.hex())
+                        flush_output('Server: M2 = <%s>' % m2.hex())
+                        flush_output('Server: Sending M2 = <%s>' % m2.hex())
                         conn.sendall(m2)
 
                         ciphertext_size = int.from_bytes(conn.recv(4), 'big')
