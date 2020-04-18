@@ -143,10 +143,6 @@ def setup_socket(p, q, n, e, d):
                     flush_output('TTP: Sending TTP_e = <%s>' % e_bytes.hex())
                     conn.sendall(ttp_pk)
 
-                    conn.close()
-                    soc.close()
-                    break
-
 
 def main():
     p, q, n, e, d = calculate_rsa_parameters()

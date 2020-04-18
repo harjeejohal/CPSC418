@@ -39,9 +39,68 @@ ASSIGNMENT 3 }
 
 \item The message $M_2$ is of the form $M_2 = M_1 || X$, where $X$ is an arbitrary $n$-bit block. From
 the question description we also know that $M_1 = P_1 || P_2 || \ldots || P_L$, where $P_1, P_2, \ldots, P_L$ are
-each $n$-bit blocks. 
+each $n$-bit blocks. In this case, 
+
+\begin{align*}
+    \PHMAC_K{(M_2)} &= ITHASH(K || M_1 || X) \\
+    &= ITHASH(K || P_1 || P_2 || \ldots || P_L || X)
+\end{align*}
+
+From the algorithmic description of the ITHASH function, we can see that the result of a given iteration ITHASH$(K || P_1 || P_2 || \ldots || P_{i - 1} || P_i)$, is equal to $f(H, P_i)$ where $f$ is a public compression function, and $H$ is the value of ITHASH computed in the previous iteration: ITHASH$(K || P_1 || P_2 || \ldots || P_{i - 1})$, and $P_i$ is the $i^{th}$ $n$-bit block of the message being hashed. \\
+
+From this, we can see that:
+
+\begin{align*}
+    \PHMAC_K{(M_2)} &= ITHASH(K || M2) \\
+    &= ITHASH(K || P_1 || P_2 || \ldots || P_L || X) \\
+    &= f(ITHASH(K || P_1 || P_2 || \ldots || P_L), X) \\
+    &= f(ITHASH(K || M_1), X) \\
+    &= f(\PHMAC_K{(M_1)}, X)
+\end{align*}
+
+Since both $\PHMAC_K{(M_1)}$ and $X$ are known, and $f$ is a publicly accessible function, that means that we can compute $\PHMAC_K{(M_2)}$ as $f(\PHMAC_K{(M_1)}, X)$, which does not require any knowledge of the value of $K$. Thus, the computational resistance of PHMAC is thwarted. \\
+
 
 \item % part (b)
+
+Since ITHASH is defined as being not weakly collision resistant, that means that given a pair ($M$, ITHASH($M$)), it's possible to find another pair ($M'$, ITHASH($M'$)) such that 
+
+\begin{align*}
+    ITHASH(M) = ITHASH(M')
+\end{align*} and 
+
+\begin{align*}
+    M \neq M'
+\end{align*}
+
+Since the compression function used in ITHASH is public, that means that it's possible to compute ITHASH($M_1$). Then, given ($M_1$, ITHASH($M_1$)), we can find a value $M_2$ such that $M_1 \neq M_2$ and ITHASH($M_1$) = ITHASH($M_2$). By definition,
+
+\begin{align*}
+    \AHMAC_K{(M_2)} = ITHASH(M_2 || K)
+\end{align*}
+
+In the previous part, we demonstrated that 
+
+\begin{align*}
+    ITHASH(K || P_1 || P_2 || \ldots || P_{i - 1} || P_i) = f(ITHASH(K || P_1 || P_2 || \ldots || P_{i - 1}), P_i)
+\end{align*}
+
+We know that the key $K$ is also $n$-bits long. That means that $\AHMAC_K{(M_2)}$ can be re-written as:
+
+\begin{align*}
+    \AHMAC_K{(M_2)} &= ITHASH(M_2 || K) \\
+    &= f(ITHASH(M_2), K)
+\end{align*}
+
+By definition, ITHASH($M_2$) = ITHASH($M_1$). This means that $\AHMAC_K{(M_2)}$ can once again be re-written as:
+
+\begin{align*}
+    \AHMAC_K{(M_2)} &= f(ITHASH(M_1), K) \\
+    &= ITHASH(M_1 || K)
+\end{align*}
+
+By definition, $\AHMAC_K{(M_1)} = ITHASH(M_1 || K)$. This means that $\AHMAC_K{(M_1)} = \AHMAC_K{(M_2)}$. Thus, we have demonstrated that given a message/ AHMAC pair ($M_1$, AHMAC($M_1$)), it's possible to find a message/ AHMAC pair ($M_2$, AHMAC($M_2$)) without knowledge of $K$. Thus, computational resistance has been defeated in this case.
+
 \end{enumerate}
 
 \newpage
@@ -91,10 +150,10 @@ Since $q$ is a prime, that means that $\phi{(q)} = q - 1$. Earlier, we demonstra
 
 Thus, we can see that $M_q \equiv C^d \quad \mod{q}$. That means that $M_q = C^d + tq$, where $t$ is an integer. \\
 
-Lastly, we are told that $M \equiv pxM_q + qyM_p \quad \mod{n}$. We can substitute $M_p$ with $C^d + sp$ and $M_q$ with $C^d + tq$ to obtain:
+Lastly, we are told that $M' \equiv pxM_q + qyM_p \quad \mod{n}$, where $M'$ is the value derived from this version of RSA decryption. We can substitute $M_p$ with $C^d + sp$ and $M_q$ with $C^d + tq$ to obtain:
 
 \begin{align*}
-    M &\equiv pxM_q + qyM_p \quad \mod{n} \\
+    M' &\equiv pxM_q + qyM_p \quad \mod{n} \\
     &\equiv px(C^d + tq) + qy(C^d + sp) \quad \mod{n} \\
     &\equiv pxC^d + pqtx + qyC^d + pqsy \quad \mod{n} \\
     &\equiv C^d(px + qy) + pq(tx + sy) \quad \mod{n}
@@ -103,12 +162,12 @@ Lastly, we are told that $M \equiv pxM_q + qyM_p \quad \mod{n}$. We can substitu
 Where $tx + sy$ is an integer. We know that $n = pq$, and from step 3 of the algorithm we know that $px + qy = 1$. Using this information, we obtain:
 
 \begin{align*}
-    M &\equiv C^d(px + qy) + pq(tx + sy) \quad \mod{n} \\
+    M' &\equiv C^d(px + qy) + pq(tx + sy) \quad \mod{n} \\
     &\equiv C^d + n(tx + sy) \quad \mod{n} \\
     &\equiv C^d \quad \mod{n}
 \end{align*}
 
-We can remove $n(tx + sy)$ from the expression since it's a multiple of $n$, and the modular arithmetic is being done modulus $n$. Therefore, we obtain $M \equiv C^d \quad \mod{n} \equiv M^{ed} \quad \mod{n}$. In RSA, integers $e$ and $d$ are determined so that $ed \equiv 1 \quad \mod{n}$. Therefore, that means that $M \equiv M^{ed} \quad \mod{n} \equiv M^1 \quad \mod{n} \equiv M \quad \mod{n}$. Therefore, the $M$ obtained using this method of decryption is the same as the $M$ determined during "normal" RSA decryption.
+We can remove $n(tx + sy)$ from the expression since it's a multiple of $n$, and the modular arithmetic is being done modulus $n$. Therefore, we obtain $M' \equiv C^d \quad \mod{n} \equiv M^{ed} \quad \mod{n}$. In RSA, integers $e$ and $d$ are determined so that $ed \equiv 1 \quad \mod{n}$. Therefore, that means that $M' \equiv M^{ed} \quad \mod{n} \equiv M^1 \quad \mod{n} \equiv M \quad \mod{n}$. Therefore, the $M'$ that we obtain using this method of decryption is the same as the $M$ determined during "normal" RSA decryption.
 
 \newpage
 
@@ -298,16 +357,223 @@ We've proved that all of Mallory's assertions are true. Therefore, El Gamal is n
 \begin{enumerate}
 
 \item % part (a)
+By definition, $e, d > 1$. The minimum value that $ed$ could possibly take occurs when $e = d = 2$, where we get $ed = 4$. This means that it's not possible to pick values for $e, d$ such that $ed = 1$. Therefore, the minimum value that $ed$ can take on such that $ed \equiv 1 \mod{\phi(n)}$ is $ed = 1 + \phi{(n)}$. In this case, $k = 1$, since $ed = 1 + (1)\phi{(n)}$. Thus, we have demonstrated that $k \geq 1$. \\
+
+We can show that $k < d$ through a proof by contradiction. Suppose that $k \geq d$. We know that since $ed \equiv 1 \mod{\phi(n)}$, then $ed = 1 + k\phi(n)$. This can be re-arranged to obtain $ed - k\phi(n) = 1$. Since $k \geq d$, then that means that in order for this equation to hold, $e > \phi(n)$ must also be true. This is because if $e \leq \phi(n)$ that would imply that $ed \leq k\phi(n)$, which would make $ed - k\phi(n) = 1$ impossible. However, $e > \phi(n)$ is not possible, since by definition $1 < e < \phi(n)$. This is a contradiction, meaning that it's not possible to have $k \geq d$. Thus, it must be the case that $k < d$. \\
+
+From the previous two explanations, we can see that $1 \leq k < d$. \\
+
+Next, we must prove that $gcd(d, k) = 1$. We can prove this by using the properties of modular inversion. By definition, a number $a$ has an inverse modulo $m$, meaning that there exists some integer $x$ such that $ax \equiv 1 \mod{m}$, if and only if $gcd(a, m) = 1$. Furthermore, if $ax \equiv 1 \mod{m}$, then that means $ax - my = 1$, for some integer $y$. \\
+
+Now, let's revisit $ed = 1 + k\phi(n)$. We can re-write this as $ed - k\phi(n) = 1$, which is similar to the form $ax - my = 1$. From this, we can draw two potential conclusions. The first conclusion is that $ed \equiv 1 \mod{\phi(n)}$, meaning that $d$ has an inverse modulo $\phi(n)$, $e$. Thus, $gcd(d, \phi(n))$. 
+\\ \\
+The second conclusion is that $ed \equiv 1 \mod{k}$. This holds because we can write 
+
+\begin{align*}
+    ed - km = 1
+\end{align*}
+
+for some integer $m$ (in this case $m = \phi(n)$). Therefore, since $ed \equiv 1 \mod{k}$ that means that $e$ is $d$'s inverse modulo $k$. Since $d$ has an inverse modulo $k$, that means that $gcd(d, k) = 1$ by the definition of a modular inverse.
+\\
 
 \item % part (b)
+In this question, we are asked to prove that $2 \leq n - \phi(n) < 3\sqrt{n}$. Since $n = pq$ and $\phi(n) = (p-1)(q-1)$, we can re-write $n - \phi(n)$ as:
+
+\begin{align*}
+    n - \phi(n) &= pq - (p - 1)(q - 1) \\
+    &= pq - (pq - p - q + 1) \\
+    &= pq - pq + p + q - 1 \\
+    n - \phi(n) &= p + q + 1
+\end{align*}
+
+Now that we've established this, we can find the minimum value of $n - \phi(n)$ by finding the minimum values for $p$ and $q$. We are told that both $p$ and $q$ are odd primes, and that $q < p < 2q$. The two smallest values that satisfy these conditions are $q = 3$ and $p = 5$. We then plug these values into the equation:
+
+\begin{align*}
+    n - \phi(n) &= p + q - 1 \\
+    &= 5 + 3 - 1 \\
+    &= 7
+\end{align*}
+
+Therefore, the minimum value for $n - \phi(n)$ under these constraints is 7. From inspection, we can see that $7 \geq 2$, meaning that we have demonstrated that $n - \phi(n) \geq 2$.
+\\
+
+Next, we must prove that $n - \phi(n) < 3\sqrt{n}$. We've already shown that:
+
+\begin{align*}
+    n - \phi(n) = p + q - 1
+\end{align*}
+
+We also know that $p$ and $q$ must be odd primes such that $q < p < 2q$. Since we must pick $p < 2q$, that means that our value for $n - \phi(n)$ is also bounded such that:
+
+\begin{align*}
+    n - \phi(n) &= p + q - 1 \\
+    &< (2q) + q - 1  = 3q - 1\\
+    n - \phi(n) &< 3q - 1
+\end{align*}
+
+Thus, we see that $n - \phi(n) < 3q - 1$. We know that $n = pq$. Since $p < 2q$, then that means
+
+\begin{align*}
+    n &< pq \\
+    &< (2q)q \\
+    &< 2q^2
+\end{align*}
+
+Thus, we know that $n < 2q^2$. From this, we can see that $\sqrt{n} < \sqrt{2}q$, and from this we see that $3\sqrt{n} < 3\sqrt{2}q$. \\
+
+Now, we compare these two pieces of information. We know that the upper bound of $n - \phi(n)$ is $3q - 1$, and we know that the upper bound of $3\sqrt{n}$ is $3\sqrt{2}q$. We also know that the upper bound for both of these values is defined by the constraint $p < 2q$. By inspection, we can see that $3\sqrt{2}q > 3q - 1$ for all values of $q$, meaning that $3\sqrt{n} > 3q - 1$. Since we know that $n - \phi(n) < 3q - 1$ and $3q - 1 < 3\sqrt{n}$, then that must mean that $n - \phi(n) < 3\sqrt{n}$. \\
+
+We have proven that $2 \leq n - \phi(n)$ and that $n - \phi(n) < 3\sqrt{n}$. Therefore, we have proven that $2 \leq n - \phi(n) < 3\sqrt{n}$.
+\\
 
 \item % part (c)
 
+In this part we are asked to prove that $0 < kn - ed < 3d\sqrt{n}$. From the question description, we know that $ed = 1 + k\phi(n)$. We can use this equation to obtain:
+
+\begin{align*}
+    kn - ed &= kn - (1 + k\phi(n)) \\
+    &= kn - 1 - k\phi(n) \\
+    &= k(n - \phi(n)) - 1
+\end{align*}
+
+From part (b), we know that $2 \leq n - \phi(n)$. From this, we can see that if $2 \leq n - \phi(n)$, then $2k - 1 \leq k(n - \phi(n)) - 1$. From part (a), we know that $1 \leq k$. Therefore, the minimum value $k$ can take is $k = 1$. If we plug this into the inequality, we obtain: 
+
+\begin{align*}
+    2k - 1 = 2(1) - 1 = 1 \leq k(n - \phi(n)) - 1
+\end{align*}
+
+Thus, we have shown that $1 \leq k(n - \phi(n)) - 1$. From this, we can conclude that $0 < k(n - \phi(n)) - 1$ \\
+
+Next, we must show that $k(n - \phi(n)) - 1 < 3d\sqrt{n}$. From part (b), we know that $n - \phi(n) < 3\sqrt{n}$. From this, we can see that $k(n - \phi(n)) - 1 < 3k\sqrt{n} - 1$. In part (a), we determined that $k < d$. Therefore, it must be true that $3k\sqrt{n} - 1 < 3d\sqrt{n} - 1$. Since $3d\sqrt{n} - 1 < 3d\sqrt{n}$, that means that $3k\sqrt{n} - 1 < 3d\sqrt{n}$ must also be true. Since we know $k(n - \phi(n)) - 1 < 3k\sqrt{n} - 1$, and $3k\sqrt{n} - 1 < 3d\sqrt{n}$, we can see that $k(n - \phi(n)) - 1 < 3d\sqrt{n}$. \\
+
+Thus we have also proven both $0 < k(n - \phi(n)) - 1$ and $k(n - \phi(n)) - 1 < 3d\sqrt{n}$, meaning that we have proven:
+
+\begin{align*}
+    0 < k(n - \phi(n)) - 1 < 3d\sqrt{n}
+\end{align*}
+
+Since $k(n - \phi(n)) - 1 = kn - ed$, that means we've proven:
+
+\begin{align*}
+    0 < kn - ed < 3d\sqrt{n}
+\end{align*}
+\\
+
 \item % part (d)
+
+We are asked to show that $0 < \frac{k}{d} - \frac{e}{n} < \frac{1}{2d^2}$. From part (c), we know that
+
+\begin{align*}
+    0 < kn - ed < 3d\sqrt{n}
+\end{align*}
+
+If we divide the entire inequality by $dn$, which we can do since $0 < d, n$ by definition, we get:
+
+\begin{align*}
+    0 < \frac{k}{d} - \frac{e}{n} < \frac{3}{\sqrt{n}}
+\end{align*}
+
+By inspection, we can already see that $0 < \frac{k}{d} - \frac{e}{n}$. Thus, we must prove that $\frac{k}{d} - \frac{e}{n} < \frac{1}{2d^2}$. In the preliminary information for the question, we are told that $d < \frac{\sqrt[4]{n}}{\sqrt{6}}$. We can re-arrange this inequality as follows:
+
+\begin{align*}
+    d &< \frac{\sqrt[4]{n}}{\sqrt{6}} \\
+    d^2 &< \frac{\sqrt{n}}{6} \\
+    6d^2 &< \sqrt{n}
+\end{align*}
+
+From this, we can conclude that $6d^2 < \sqrt{n}$. If $6d^2 < \sqrt{n}$, then that means $\frac{3}{\sqrt{n}} < \frac{3}{6d^2}$. Since $\frac{k}{d} - \frac{e}{n} < \frac{3}{\sqrt{n}}$ and $\frac{3}{\sqrt{n}} < \frac{3}{6d^2}$, then that means $\frac{k}{d} - \frac{e}{n} < \frac{3}{6d^2}$. We can simply $\frac{3}{6d^2}$ into $\frac{1}{2d^2}$, meaning that $\frac{k}{d} - \frac{e}{n} < \frac{1}{2d^2}$.
+\\
+Thus, we have demonstrated that $0 < \frac{k}{d} - \frac{e}{n} < \frac{1}{2d^2}$.
+\\
 
 \item % part (e)
 
+In this question, we are asked to prove that when we apply the Euclidean theorem to $e$ and $n$, $k = A_i$ and $d = B_i$ for some $i \in \{1, 2, \ldots, m\}$, where $A_i, B_i$ are the associated sequences defined in the question. First, let us define our positive rational number $r = \frac{a}{b} \in \mathbb{Q}$ with $a, b \in \mathbb{N}$ as $r = \frac{e}{n}$ as specified in the question. We can then use the theorem defined in the question. The theorem states if we let $r = \frac{a}{b} \in \mathbb{Q}$ and let $\frac{A}{B} \in \mathbb{Q}$ be a fraction in the lowest terms such that
+
+\begin{align*}
+    \mid r - \frac{A}{B} \mid < \frac{1}{2B^2}
+\end{align*}
+
+Then $A = A_i$ and $B = B_i$ for some $i \in \{1, 2, \ldots, m\}$. In our case, $r = \frac{e}{n}$, meaning that we must find values $A$ and $B$ such that
+
+\begin{align*}
+    \mid \frac{e}{n} - \frac{A}{B} \mid < \frac{1}{2B^2}
+\end{align*}
+
+Suppose we set $A = k$ and $B = d$. Then $\frac{A}{B} = \frac{k}{d}$. We already know that $\frac{k}{d}$ is in lowest terms, since we proved that $gcd(d, k) = 1$ in part (a). Then if we could show that
+
+\begin{align*}
+    \mid \frac{e}{n} - \frac{k}{d} \mid < \frac{1}{2d^2}
+\end{align*}
+
+
+we could prove that $k = A_i$ and $d = B_i$ for some $i \in \{1, 2, \ldots, m\}$. By the definition of absolute values, we know that
+
+\begin{align*}
+    \mid \frac{e}{n} - \frac{k}{d} \mid \quad = \quad \mid \frac{k}{d} - \frac{e}{n} \mid
+\end{align*}
+
+Furthermore, we know from part (d) that $\frac{k}{d} - \frac{e}{n} > 0$. From this, we can conclude that 
+
+\begin{align*}
+    \mid \frac{k}{d} - \frac{e}{n} \mid \quad = \quad \frac{k}{d} - \frac{e}{n}
+\end{align*}
+
+Which ultimately means that
+
+\begin{align*}
+   \mid \frac{e}{n} - \frac{k}{d} \mid \quad = \quad \frac{k}{d} - \frac{e}{n}
+\end{align*}
+
+Thus, the inequality in the theorem now becomes:
+
+\begin{align*}
+    \frac{k}{d} - \frac{e}{n} < \frac{1}{2d^2}
+\end{align*}
+
+We already proved that this inequality is true in part (d). Therefore, we have shown that when we let $\frac{A}{B} = \frac{k}{d}$, we get a fraction in lowest terms such that 
+
+\begin{align*}
+    \mid \frac{e}{n} - \frac{k}{d} \mid < \frac{1}{2d^2}
+\end{align*}
+
+Thus according to the theorem, that means that $k = A_i$ and $d = B_i$ for some $i \in \{1, 2, \ldots, m\}$. Therefore, we have proven what was asked of us.
+\\
+
 \item % part (f)
+Lastly, we are asked to derive a procedure to find $d$, and subsequently factor $n$. In order to find $d$ we can take advantage of two things. First, we can use $ed = 1 + k\phi(n)$. If we manipulate this equation, we get:
+
+\begin{align*}
+    \phi(n) = \frac{ed - 1}{k}
+\end{align*}
+
+The next thing that we can use is the statement that we proved to be true in part (e). Namely, we can use the fact that $k = A_i$ and $d = B_i$ for some $i \in \{1, 2, \ldots, m\}$ when we apply the Euclidean algorithm to $e$ and $n$. From these two pieces of information, we can derive a procedure to find $d$. \\
+
+First, perform the Euclidean algorithm for $e$ and $n$. Then, for each $A_i$, $B_i$ for $i \in \{1, 2, \ldots, m\}$, check to see if 
+
+\begin{align*}
+    \mid \frac{e}{n} - \frac{A_i}{B_i} \mid < \frac{1}{2B_i^2}
+\end{align*}
+
+is satisfied. If it is, then this value of $A_i$ is a candidate value for $k$, and similarly this value of $B_i$ is a candidate value for $d$. In order to confirm where these candidate values are the true values for $d$ and $k$, we feed them into the following equation:
+
+\begin{align*}
+    \phi(n) = \frac{eB_i - 1}{A_i}
+\end{align*}
+
+If $A_i = k$ and $B_i = d$, then this equation merely becomes
+
+\begin{align*}
+    \phi(n) = \frac{ed - 1}{k}
+\end{align*}
+
+Therefore, if a given pair $A_i$, $B_i$ output an integer when they're passed into $\phi(n) = \frac{eB_i - 1}{A_i}$, then we learn 3 things: that $k = A_i$, $d = B_i$, and the value of $\phi(n)$. Now that we know $n$ and $\phi(n)$, we can factor $n$ to find $p$ and $q$ by solving the following equation that was provided to us in class:
+
+\begin{align*}
+    x^2 - (n - \phi(n) + 1)x + n = 0
+\end{align*}
+
+for x. The solutions of this equation are $p$ and $q$. Thus, the procedure that we've specified both finds $d$ and factors $n$ efficiently.
 
 \end{enumerate}
 
