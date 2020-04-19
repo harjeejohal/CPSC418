@@ -213,6 +213,7 @@ From this, we can see that $n = (a + b)(a - b)$. Since $n = pq$ and $n > p > q >
 
 \item  % part (c)
 The value of $a$ is initialized as $a = \lceil \sqrt{n} \rceil$. During the first iteration of the loop, the algorithm first performs $a = a + 1$, and then computes $b = \sqrt{a^2 - n}$. It continues to do this until it finally reaches $a = x$. This means that the first iteration of the loop is performed with $a = \lceil \sqrt{n} \rceil + 1$, and the last iteration of the loop is done with $a = x$. The number of iterations between the first and last values of $a$ is thus $x - \lceil \sqrt{n} \rceil$. The last iteration of the loop is after $a = x$. The condition at the top of the \textit{while} loop is checked one last time. Since $b$ is an integer when $a = x$, that means that the condition at the top of the \textit{while} loop will not be satisfied on the last iteration, meaning that the \textit{while} loop will be skipped. However, this iteration is still counted. Therefore, there are $x - \lceil \sqrt{n} \rceil$ iterations where the loop is entered, and $1$ iteration where the loop is not entered. Therefore, there are $x - \lceil \sqrt{n} \rceil + 1$ iterations overall.
+\\
 
 \item  % part (d)
 We are asked to prove that $x - \lceil \sqrt{n} \rceil < \frac{y^2}{2\sqrt{n}}$. We know that $n = x^2 - y^2$. We can rearrange this to get $y^2 = x^2 - n = (x + \sqrt{n})(x - \sqrt{n})$. We can re-arrange this equation to get: $(x - \sqrt{n}) = \frac{y^2}{x + \sqrt{n}}$. \\
@@ -220,6 +221,7 @@ We are asked to prove that $x - \lceil \sqrt{n} \rceil < \frac{y^2}{2\sqrt{n}}$.
 In part (a), we showed that $x > \sqrt{n}$. From this, we can see that $x + \sqrt{n} > 2\sqrt{n}$. Since $2\sqrt{n} < x + \sqrt{n}$, that means that $\frac{y^2}{2\sqrt{n}} > \frac{y^2}{x + \sqrt{n}}$. Since $(x - \sqrt{n}) = \frac{y^2}{x + \sqrt{n}}$, that means that $(x - \sqrt{n}) < \frac{y^2}{2\sqrt{n}}$. \\
 
 By definition, $\lceil \sqrt{n} \rceil \geq \sqrt{n}$. Since $\lceil \sqrt{n} \rceil \geq \sqrt{n}$, then that means $x - \sqrt{n} \geq x - \lceil \sqrt{n} \rceil$. We can use this to show that since $(x - \sqrt{n}) < \frac{y^2}{2\sqrt{n}}$, that means $(x - \lceil \sqrt{n} \rceil) < \frac{y^2}{2\sqrt{n}}$. Thus, we have proven that $x - \lceil \sqrt{n} \rceil < \frac{y^2}{2\sqrt{n}}$.
+\\
 
 \item  % part (e)
 Suppose that $p - q < 2B\sqrt[4]{n}$. We can re-arrange this to obtain:
