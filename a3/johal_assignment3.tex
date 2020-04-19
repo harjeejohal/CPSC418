@@ -167,7 +167,7 @@ Where $tx + sy$ is an integer. We know that $n = pq$, and from step 3 of the alg
     &\equiv C^d \quad \mod{n}
 \end{align*}
 
-We can remove $n(tx + sy)$ from the expression since it's a multiple of $n$, and the modular arithmetic is being done modulus $n$. Therefore, we obtain $M' \equiv C^d \quad \mod{n} \equiv M^{ed} \quad \mod{n}$. In RSA, integers $e$ and $d$ are determined so that $ed \equiv 1 \quad \mod{n}$. Therefore, that means that $M' \equiv M^{ed} \quad \mod{n} \equiv M^1 \quad \mod{n} \equiv M \quad \mod{n}$. Therefore, the $M'$ that we obtain using this method of decryption is the same as the $M$ determined during "normal" RSA decryption.
+We can remove $n(tx + sy)$ from the expression since it's a multiple of $n$, and the modular arithmetic is being done modulus $n$. Therefore, we obtain $M' \equiv C^d \quad \mod{n} \equiv M^{ed} \quad \mod{n}$. By definition in RSA, $M^{ed} \equiv M \mod{n}$. Therefore, that means that $M' \equiv M^{ed} \quad \mod{n} \equiv M \quad \mod{n}$. Therefore, the $M'$ that we obtain using this method of decryption is the same as the $M$ determined during "normal" RSA decryption.
 
 \newpage
 
@@ -383,7 +383,7 @@ In this question, we are asked to prove that $2 \leq n - \phi(n) < 3\sqrt{n}$. S
     n - \phi(n) &= pq - (p - 1)(q - 1) \\
     &= pq - (pq - p - q + 1) \\
     &= pq - pq + p + q - 1 \\
-    n - \phi(n) &= p + q + 1
+    n - \phi(n) &= p + q - 1
 \end{align*}
 
 Now that we've established this, we can find the minimum value of $n - \phi(n)$ by finding the minimum values for $p$ and $q$. We are told that both $p$ and $q$ are odd primes, and that $q < p < 2q$. The two smallest values that satisfy these conditions are $q = 3$ and $p = 5$. We then plug these values into the equation:
@@ -558,7 +558,7 @@ First, perform the Euclidean algorithm for $e$ and $n$. Then, for each $A_i$, $B
 is satisfied. If it is, then this value of $A_i$ is a candidate value for $k$, and similarly this value of $B_i$ is a candidate value for $d$. In order to confirm where these candidate values are the true values for $d$ and $k$, we feed them into the following equation:
 
 \begin{align*}
-    \phi(n) = \frac{eB_i - 1}{A_i}
+    candidate \phi(n) = \frac{eB_i - 1}{A_i}
 \end{align*}
 
 If $A_i = k$ and $B_i = d$, then this equation merely becomes
@@ -567,13 +567,39 @@ If $A_i = k$ and $B_i = d$, then this equation merely becomes
     \phi(n) = \frac{ed - 1}{k}
 \end{align*}
 
-Therefore, if a given pair $A_i$, $B_i$ output an integer when they're passed into $\phi(n) = \frac{eB_i - 1}{A_i}$, then we learn 3 things: that $k = A_i$, $d = B_i$, and the value of $\phi(n)$. Now that we know $n$ and $\phi(n)$, we can factor $n$ to find $p$ and $q$ by solving the following equation that was provided to us in class:
+Therefore, if a given pair $A_i$, $B_i$ output an integer when they're passed into $candidate \phi(n) = \frac{eB_i - 1}{A_i}$, then we learn 3 things: that $A_i$ is a candidate value for $k$, $B_i$ is candidate value for $d$, and we find a candidate value for $\phi(n)$. Now that we know $n$ and we have a candidate value for $\phi(n)$, we can factor $n$ to find our potential $p$ and potential $q$ by solving the following equation that was provided to us in class:
 
 \begin{align*}
-    x^2 - (n - \phi(n) + 1)x + n = 0
+    x^2 - (n - (candidate \phi(n)) + 1)x + n = 0
 \end{align*}
 
-for x. The solutions of this equation are $p$ and $q$. Thus, the procedure that we've specified both finds $d$ and factors $n$ efficiently.
+for x. Assuming that $candidate\phi(n)$ actually does equal $\phi(n)$, the solutions to this equation are $p$ and $q$. This equation is designed to factor $n$, meaning that the solutions of this equation can be multiplied together such that their product is $n$. Since $n$'s prime factorization is $n = pq$, that means that if the solutions of the equation are both integers, the solutions must be $p$ and $q$. This is because by definition, the product of two primes can have no integer factors outside of those two primes, barring itself and 1. Therefore, if the two solutions are integers with a product $n$, such that the solutions aren't $1$ and $n$, they must be $p$ and $q$. This of course only happens if $candidate\phi(n) = \phi(n)$. If this is the case, then we have successfully found the value of $d$ and $\phi(n)$, and also factored $n$. If this is not the case, then we must go back to the beginning of the algorithm and check the next ($A_i$, $B_i$) pair to see if
+
+\begin{align*}
+    \mid \frac{e}{n} - \frac{A_i}{B_i} \mid < \frac{1}{2B_i^2}
+\end{align*}
+
+again and repeat the process. We repeat this process until we finally find an ($A_i$, $B_i$) pair that gives us the true value of $\phi(n)$ and factors $n$ to find $p$ and $q$. We know that this will eventually happen, since we proved in part (e) that $k = A_i$ and $d = B_i$ for some $i \in \{1, 2, \ldots, m\}$. \\
+
+We know that the number of computations is small, since there are only $m$ pairs of numbers that need to be to be checked: the pairs ($A_i$, $B_i$) for $i \in \{1, 2, \ldots, m\}$ that are generated when the Euclidean algorithm is applied to $e$ and $n$. These can all easily be found. Thus, in the worst case case, we would have to compute, 
+
+\begin{align*}
+    \mid \frac{e}{n} - \frac{A_i}{B_i} \mid < \frac{1}{2B_i^2}
+\end{align*}
+
+$m$ times, compute 
+
+\begin{align*}
+    candidate \phi(n) = \frac{eB_i - 1}{A_i}
+\end{align*}
+
+$m$ times, and solve 
+
+\begin{align*}
+    x^2 - (n - (candidate \phi(n)) + 1)x + n = 0
+\end{align*}
+
+$m$ times. Since the number of computations is bounded by $m$, we can see that the number of computations will be relatively small.
 
 \end{enumerate}
 
@@ -586,18 +612,210 @@ for x. The solutions of this equation are $p$ and $q$. Thus, the procedure that 
 \begin{enumerate}
 
 \item % part (a)
+In this question, we are asked to prove that $R \equiv ru \quad (\mod{p - 1})$, and to also show that $y^R \equiv y^{ru} \quad (\mod{p})$. By definition, we know that $R \equiv rup - r(p - 1) (\mod{p(p-1)})$. From this, we can see that 
+
+\begin{align*}
+    R &= rup - r(p - 1) + ap(p-1) \\
+    &= rup + (ap - r)(p-1)
+\end{align*}
+
+For some integer $a$, where $ap - r$ is an integer. Thus, we when attempt to find $R \quad (\mod{p-1})$, we find that
+
+\begin{align*}
+    R &\equiv rup + (ap - r)(p - 1) \quad (\mod{p - 1}) \\
+    &\equiv rup \quad (\mod{p - 1})
+\end{align*}
+
+Since we're performing arithmetic modulo $p - 1$, we can remove $(ap - r)(p - 1)$, since it's an integer multiple of $p - 1$. Next, we can see that $p = (p - 1) + 1$. If we re-write it as such, we get
+
+\begin{align*}
+    R &\equiv rup \quad (\mod{p - 1}) \\
+    &\equiv ru((p - 1) + 1) \quad (\mod{p - 1}) \\
+    &\equiv ru(p - 1) + ru \quad (\mod{p - 1}) \\
+    &\equiv ru \quad (\mod{p - 1})
+\end{align*}
+
+Once again, we can remove $ru(p - 1)$ since it's an integer multiple of $p - 1$. Thus, we have proved that $R \equiv ru \quad (\mod{p - 1})$. \\
+
+Next, we must prove that $y^R \equiv y^{ru} \quad (\mod{p})$. We know that $R \equiv ru \quad (\mod{p - 1})$, that means that
+
+\begin{align*}
+    R = ru + b(p - 1)
+\end{align*}
+
+for some integer $b$. Knowing this, we can re-write $y^R \quad (\mod{p})$:
+
+\begin{align*}
+    y^R &\equiv y^{ru + b(p - 1)} \quad (\mod{p}) \\
+    &\equiv (y^{ru}) (y^{p - 1})^b \quad (\mod{p})
+\end{align*}
+
+From the question description, we know that $y \equiv g^x \quad (\mod{p})$. Therefore, we can further modify $y^R \quad (\mod{p})$ to get
+
+\begin{align*}
+    y^R &\equiv (y^{ru}) ((g^x)^{p - 1})^b \quad (\mod{p}) \\
+    &\equiv (y^{ru}) (g^{p - 1})^{bx} \quad (\mod{p})
+\end{align*}
+
+Since $p$ is a prime, and $g$ is a primitive root of $p$, then by Fermat's Little Theorem, $g^{p - 1} \equiv 1 \quad (\mod{p})$. With this final piece of information, we can manipulate $y^R$ to obtain
+
+\begin{align*}
+    y^R &\equiv (y^{ru}) (g^{p - 1})^{bx} \quad (\mod{p}) \\
+    &\equiv (y^{ru}) (1)^{bx} \quad (\mod{p}) \\
+    &\equiv y^{ru} \quad (\mod{p})
+\end{align*}
+
+Therefore, we have demonstrated that $y^R \equiv y^{ru} \quad (\mod{p})$.
+\\
 
 \item % part (b)
 
+Next, we are asked to prove that $R^s \equiv r^{su} \quad (\mod{p})$. In part (a), we determined that since $R \equiv rup - r(p-1) \quad (\mod{p(p-1)})$, meaning that
+
+\begin{align*}
+    R &= rup - r(p - 1) + ap(p-1)
+\end{align*}
+
+for some integer $a$. We can manipulate this equation as follows
+
+\begin{align*}
+    R &= rup - r(p - 1) + ap(p - 1) \\
+    &= rup - rp + r + ap(p - 1) \\
+    &= r + p(a(p-1) + ru - r)
+\end{align*}
+
+Where $a(p-1) + ru - r$ is an integer. When we compute $R \quad (\mod{p})$, we see that
+
+\begin{align*}
+    R &\equiv r + p(a(p - 1) + ru - r) \quad (\mod{p}) \\
+    &\equiv r \quad (\mod{p})
+\end{align*}
+
+We can remove $p(a(p - 1) + ru - r)$ because it is an integer multiple of $p$, and we are performing arithmetic modulo $p$. Therefore, we can see that $R \equiv r \quad (\mod{p})$. From this assertion, we can also see that
+
+\begin{align*}
+    R^S \equiv r^S \quad (\mod{p})
+\end{align*}
+
+By definition, $S \equiv su \quad (\mod{p - 1})$. This means that $S = su + j(p - 1)$ for some integer $j$. Knowing this, we can re-write $R^S \quad (\mod{p})$ as
+
+\begin{align*}
+    R^S &\equiv r^S \quad (\mod{p}) \\ 
+    &\equiv r^{su + j(p - 1)} \quad (\mod{p}) \\
+    &\equiv (r^{su}) (r^{p - 1})^j \quad (\mod{p})
+\end{align*}
+
+From the problem description, we can see that $r \equiv g^k \quad (\mod{p})$. Knowing this, we can manipulate $R^S \quad (\mod{p})$ even further to obtain
+
+\begin{align*}
+    R^S &\equiv (r^{su}) (r^{p - 1})^j \quad (\mod{p}) \\
+    &\equiv (r^{su}) ((g^k)^{p - 1})^j \quad (\mod{p}) \\
+    &\equiv (r^{su}) (g^{p - 1})^{jk} \quad (\mod{p})
+\end{align*}
+
+Like in part (a), since $p$ is a prime and $g$ is a primitive root of $p$, then by Fermat's Little Theorem, $g^{p - 1} \equiv 1 \quad (\mod{p})$. Using this information, we can modify $R^S$ one last time to obtain
+
+\begin{align*}
+    R^S &\equiv (r^{su}) (g^{p - 1})^{jk} \quad (\mod{p}) \\
+    &\equiv (r^{su}) (1)^{jk} \quad (\mod{p}) \\
+    &\equiv r^{su} \quad (\mod{p})
+\end{align*}
+
+Thus, we have proven that $R^S \equiv r^{su} \quad (\mod{p})$.
+\\
+
 \item % part (c)
+Lastly, we must prove that ($R$, $S$) is a valid signature to the message $M'$, where $M'$ is an arbitrary message of Eve's choice. In other words, given a valid signature ($r$, $s$) to a message $M$, we must show that Eve can generate a valid signature ($R$, $S$) to \textit{any} message $M'$ so that it appears that the message is coming from Alice. \\
+
+By definition, ($r$, $s$) is a valid signature for a message $M$ if and only if 
+
+\begin{align*}
+    y^rr^s \equiv g^{H(M)} \quad (\mod{p})
+\end{align*}
+
+Therefore, in order for ($R$, $S$) to be a valid signature for $M'$, it must be true that
+
+\begin{align*}
+    y^RR^S \equiv g^{H(M')} \quad (\mod{p})
+\end{align*}
+
+In part (a) we proved that 
+
+\begin{align*}
+    y^R \equiv y^{ru} \quad (\mod{p})
+\end{align*}
+
+In part (b), we proved that
+
+\begin{align*}
+    R^S \equiv r^{su} \quad (\mod{p})
+\end{align*}
+
+Therefore, with these two statements we can see that
+
+\begin{align*}
+    y^RR^S \equiv y^{ru}r^{su} \quad (\mod{p})
+\end{align*}
+
+Therefore ($R$, $S$) is a valid signature for $M'$, if and only if 
+
+\begin{align*}
+    y^{ru}r^{su} \equiv g^{H(M')} \quad (\mod{p})
+\end{align*}
+
+By definition $H(M') \equiv H(M)u \quad (\mod{p - 1})$. Therefore,
+
+\begin{align*}
+    H(M') = H(M)u + z(p - 1)
+\end{align*}
+
+for some integer $z$. With this knowledge, we can show that
+
+\begin{align*}
+    g^{H(M')} &\equiv g^{H(M)u + z(p - 1)} \quad (\mod{p}) \\
+    &\equiv g^{H(M)u} (g^{p - 1})^z \quad (\mod{p})
+\end{align*}
+
+Once again, since $g$ is a primitive root of $p$, then $g^{p - 1} \equiv 1 \quad (\mod{p})$ by Fermat's Little Theorem. Knowing this, we can manipulate $g^{H(M')} \quad (\mod{p})$ even further to obtain
+
+\begin{align*}
+    g^{H(M')}  &\equiv g^{H(M)u} (g^{p - 1})^z \quad (\mod{p}) \\
+    &\equiv g^{H(M)u} (1)^z \quad (\mod{p}) \\
+    &\equiv g^{H(M)u} \quad (\mod{p})
+\end{align*}
+
+With the knowledge that $g^{H(M')} \equiv g^{H(M)u} \quad (\mod{p})$, we can now say that ($R$, $S$) is a valid signature for $M'$ if and only if
+
+\begin{align*}
+    y^{ru}r^{su} \equiv g^{H(M)u} \quad (\mod{p})
+\end{align*}
+
+We can use exponent rules on the left side of the congruence to obtain
+
+\begin{align*}
+    (y^rr^s)^u \equiv (g^{H(M)})^u \quad (\mod{p})
+\end{align*}
+
+Therefore, we can see that in this case ($R$, $S$) will be a valid signature for $M'$ if and only if $y^rr^s \equiv g^{H(M)} \quad (\mod{p})$. We know that this statement is true because ($r$, $s$) is a valid signature for $M$. By definition, this can only be true if $y^rr^s \equiv g^{H(M)} \quad (\mod{p})$. Therefore, since we know that
+
+\begin{align*}
+    y^rr^s \equiv g^{H(M)} \quad (\mod{p})
+\end{align*}
+
+is true, then that means 
+
+\begin{align*}
+    (y^rr^s)^u \equiv (g^{H(M)})^u \quad (\mod{p})
+\end{align*}
+
+This ultimately means that
+
+\begin{align*}
+    y^RR^S \equiv g^{H(M')} \quad (\mod{p})
+\end{align*}
+
+Therefore, ($R$, $S$) is a valid signature for $M'$, and we have proven what was asked of us.
 
 \end{enumerate}
-
-\newpage
-
-\stepcounter{problem} \stepcounter{problem}
-
-\item[] \textbf{Problem \theproblem} --- Columnar transposition cryptanalysis, 10 marks
-
 \end{enumerate}
 \end{document}

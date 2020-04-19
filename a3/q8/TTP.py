@@ -18,16 +18,20 @@ HOSTNAME = '127.0.4.18'
 PORT = 31802
 
 
+# This is from when I thought that the order of the print statements mattered. I used this to ensure that the
+# statements were flushed immediately
 def flush_output(message_contents):
     print(message_contents, flush=True)
 
 
+# Used to hash (Server_name || Server_PK) and (t) when computing TTP_SIG
 def hash_value(input_val):
     digest = hashes.Hash(hashes.SHA3_512(), backend=default_backend())
     digest.update(input_val)
     return digest.finalize()
 
 
+# Computes a value for e such that 1 <= e < phi(n), and gcd(e, phi(n)) = 1
 def compute_e(phi_n):
     upper_bound = phi_n - 1
     while True:
@@ -36,6 +40,7 @@ def compute_e(phi_n):
             return e_candidate
 
 
+# Finds 512-bit primes of the form p = 2q + 1, where q is also a prime
 def find_safe_prime():
     while True:
         test_prime = secrets.randbits(511)
@@ -49,33 +54,38 @@ def find_safe_prime():
                 return candidate_safe_prime
 
 
+# Calculates n, p, q, e, and d for RSA. Both p and q are defined to be 512-bit safe primes
 def calculate_rsa_parameters():
-    p = find_safe_prime()
-    q = find_safe_prime()
-    while p == q:
-        q = find_safe_prime()
+    rsa_p = find_safe_prime()
+    rsa_q = find_safe_prime()
+    while rsa_p == rsa_q:
+        rsa_q = find_safe_prime()
 
-    flush_output('TTP: TTP_p = %d' % p)
-    flush_output('TTP: TTP_q = %d' % q)
+    flush_output('TTP: TTP_p = %d' % rsa_p)
+    flush_output('TTP: TTP_q = %d' % rsa_q)
 
-    n = p * q
-    phi_n = (p - 1) * (q - 1)
-    flush_output('TTP: TTP_N = %d' % n)
+    rsa_n = rsa_p * rsa_q
+    phi_n = (rsa_p - 1) * (rsa_q - 1)
+    flush_output('TTP: TTP_N = %d' % rsa_n)
 
-    e = compute_e(phi_n)
-    d = mod_inverse(e, phi_n)
+    rsa_e = compute_e(phi_n)
+    rsa_d = mod_inverse(rsa_e, phi_n)
 
-    flush_output('TTP: TTP_e = %d' % e)
-    flush_output('TTP: TTP_d = %d' % d)
+    flush_output('TTP: TTP_e = %d' % rsa_e)
+    flush_output('TTP: TTP_d = %d' % rsa_d)
 
-    return p, q, n, e, d
+    return rsa_p, rsa_q, rsa_n, rsa_e, rsa_d
 
 
-def rsa_decrypt(message, d, n):
+# Decrypts messages as (message)^d % n
+def rsa_decrypt(message):
     return pow(message, d, n)
 
 
-def compute_ttp_sig(n, d, name, server_pk):
+# Computes the TTP signature for the server. First, we compute the SHA3-512 hash of (Server_name || Server_PK) to get t,
+# and then we determine the SHA3-512 hash of t to get t'. We then interpret (t || t') as an integer, t_int, and return
+# the RSA decryption of (t_int % n) under the TTP's d and n
+def compute_ttp_sig(name, server_pk):
     concat_val = name + server_pk
     t = hash_value(concat_val)
     t_prime = hash_value(t)
@@ -84,10 +94,15 @@ def compute_ttp_sig(n, d, name, server_pk):
     t_int = int.from_bytes(t_bytes, 'big')
     reduced_t_int = t_int % n
 
-    return rsa_decrypt(reduced_t_int, d, n)
+    return rsa_decrypt(reduced_t_int)
 
 
-def setup_socket(p, q, n, e, d):
+# This method opens up a socket that listens for connections from both the server and the client. If a request is
+# received from the server, the TTP receives (len(S) || S || Server_PK), where Server_PK = (Server_N || Server_e). These
+# values are then used to compute TTP_SIG for this server. The TTP then sends back (TTP_SIG || TTP_N) to the server.
+#
+# If the TTP receives a request from the client, it sends (TTP_N || TTP_e) to the client.
+def setup_socket():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
         flush_output('TTP is running')
         soc.bind((HOSTNAME, PORT))
@@ -122,7 +137,7 @@ def setup_socket(p, q, n, e, d):
 
                     server_pk = server_n_bytes + server_e_bytes
 
-                    ttp_sig = compute_ttp_sig(n, d, name_bytes, server_pk)
+                    ttp_sig = compute_ttp_sig(name_bytes, server_pk)
                     flush_output('TTP: TTP_SIG = %d' % ttp_sig)
 
                     n_bytes = n.to_bytes(128, byteorder='big')
@@ -144,9 +159,12 @@ def setup_socket(p, q, n, e, d):
                     conn.sendall(ttp_pk)
 
 
+# This is where the TTP's RSA parameters are initialized
+p, q, n, e, d = calculate_rsa_parameters()
+
+
 def main():
-    p, q, n, e, d = calculate_rsa_parameters()
-    setup_socket(p, q, n, e, d)
+    setup_socket()
 
 
 main()
