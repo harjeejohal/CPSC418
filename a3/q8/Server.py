@@ -239,8 +239,7 @@ def decrypt_ciphertext(ciphertext_bytes, server_key):
     plaintext = decryptor.update(ciphertext) + decryptor.finalize()
 
     unpadder = padding.PKCS7(128).unpadder()
-    unpadded_pt = unpadder.update(plaintext)
-    unpadded_pt += unpadder.finalize()
+    unpadded_pt = unpadder.update(plaintext) + unpadder.finalize()
 
     plaintext_content = unpadded_pt[:-32]
     provided_hmac = unpadded_pt[-32:]
@@ -330,7 +329,7 @@ def connect_to_client(ttp_n, ttp_sig):
 
                     if big_a % n == 0:
                         flush_output('Server: Negotiation unsuccessful.')
-                        break
+                        exit(1)
 
                     flush_output('Server: A = %d' % big_a)
 
@@ -369,7 +368,7 @@ def connect_to_client(ttp_n, ttp_sig):
                         if decrypt_ciphertext(ciphertext, server_key):
                             flush_output('Server: File transferred successfully.')
                         else:
-                            flush_output('Error occurred during file decryption')
+                            flush_output('Server: File transferred unsuccessfully.')
 
                     else:
                         flush_output('Server: Negotiation unsuccessful')

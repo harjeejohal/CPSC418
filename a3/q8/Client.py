@@ -99,14 +99,14 @@ def get_user_input():
     print("Username: ")
     username_raw = sys.stdin.readline().strip()
     # encode it as bytes, and record the length
-    username = username_raw.encode('utf-8')
+    name = username_raw.encode('utf-8')
 
     print("Password: ")
     pw_raw = sys.stdin.readline().strip()
     # encode it as bytes, and record the length
     pw = pw_raw.encode('utf-8')
 
-    return username, pw
+    return name, pw
 
 
 # Computes A = g^a (mod N)

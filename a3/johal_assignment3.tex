@@ -347,7 +347,7 @@ We've proved that all of Mallory's assertions are true. Therefore, El Gamal is n
     
     Therefore, when $C$ is an encryption of $M_2$, then the decryption of $C'$ is $M_1 \oplus M_2$. Mallory can easily compute this value, since she selects both $M_1$ and $M_2$. \\
     
-    From this, we can see that Mallory has a method to easily identify whether $C$ is the ciphertext of $M_1$ or $M_2$ based on the decryption of $C'$. If the decryption of $C'$ is 0, then $C$ is an encryption of $M_1$. Otherwise, if the decryption of $C'$ is $M_1 \oplus M_2$, then $C$ is an encryption of $M_2$.
+    From this, we can see that Mallory has a method to easily identify whether $C$ is the ciphertext of $M_1$ or $M_2$ based on the decryption of $C'$. If the decryption of $C'$ is 0, then $C$ is an encryption of $M_1$. Otherwise, if the decryption of $C'$ is $M_1 \oplus M_2$, then $C$ is an encryption of $M_2$. Of course, this is predicated on the assumption that $M_1 \neq M_2$, since if that was not the case, then $M_1 \oplus M_2 = M_1 \oplus M_1 = 0$, meaning that there would be no difference between the decryption of $C'$ for $M_1$ versus $M_2$. However, since the question states that Mallory chooese "two plaintexts", it's reasonable to assume that $M_1 \neq M_2$, meaning that our attack still works, proving that this version of RSA is not IND-CCA secure.
     
 
 \newpage
@@ -569,7 +569,7 @@ If $A_i = k$ and $B_i = d$, then this equation merely becomes
     \phi(n) = \frac{ed - 1}{k}
 \end{align*}
 
-Therefore, if a given pair $A_i$, $B_i$ output an integer when they're passed into $candidate \phi(n) = \frac{eB_i - 1}{A_i}$, then we learn 3 things: that $A_i$ is a candidate value for $k$, $B_i$ is candidate value for $d$, and we find a candidate value for $\phi(n)$. Now that we know $n$ and we have a candidate value for $\phi(n)$, we can factor $n$ to find our potential $p$ and potential $q$ by solving the following equation that was provided to us in class:
+Therefore, if a given pair $A_i$, $B_i$ output an integer when they're passed into $candidate \phi(n) = \frac{eB_i - 1}{A_i}$, then we learn 3 things: that $A_i$ is a candidate value for $k$, $B_i$ is candidate value for $d$, and we find a candidate value for $\phi(n)$. Now that we know $n$ and we have a candidate value for $\phi(n)$, we can factor $n$ to find our potential $p$ and potential $q$ by solving the following equation that was provided to us in class, which is designed to factor $n$:
 
 \begin{align*}
     x^2 - (n - (candidate \phi(n)) + 1)x + n = 0
@@ -581,27 +581,9 @@ for x. Assuming that $candidate\phi(n)$ actually does equal $\phi(n)$, the solut
     \mid \frac{e}{n} - \frac{A_i}{B_i} \mid < \frac{1}{2B_i^2}
 \end{align*}
 
-again and repeat the process. We repeat this process until we finally find an ($A_i$, $B_i$) pair that gives us the true value of $\phi(n)$ and factors $n$ to find $p$ and $q$. We know that this will eventually happen, since we proved in part (e) that $k = A_i$ and $d = B_i$ for some $i \in \{1, 2, \ldots, m\}$. \\
+again and repeat the process. We repeat this process until we finally find an ($A_i$, $B_i$) pair that gives us the true value of $\phi(n)$ and $d$, and factors $n$ to find $p$ and $q$. We know that this will eventually happen, since we proved in part (e) that $k = A_i$ and $d = B_i$ for some $i \in \{1, 2, \ldots, m\}$. \\
 
-We know that the number of computations is small, since there are only $m$ pairs of numbers that need to be to be checked: the pairs ($A_i$, $B_i$) for $i \in \{1, 2, \ldots, m\}$ that are generated when the Euclidean algorithm is applied to $e$ and $n$. These can all easily be found. Thus, in the worst case case, we would have to compute, 
-
-\begin{align*}
-    \mid \frac{e}{n} - \frac{A_i}{B_i} \mid < \frac{1}{2B_i^2}
-\end{align*}
-
-$m$ times, compute 
-
-\begin{align*}
-    candidate \phi(n) = \frac{eB_i - 1}{A_i}
-\end{align*}
-
-$m$ times, and solve 
-
-\begin{align*}
-    x^2 - (n - (candidate \phi(n)) + 1)x + n = 0
-\end{align*}
-
-$m$ times. Since the number of computations is bounded by $m$, we can see that the number of computations will be relatively small.
+We know that the number of computations is small, since there are only $m$ pairs of numbers that need to be to be checked: the pairs ($A_i$, $B_i$) for $i \in \{1, 2, \ldots, m\}$ that are generated when the Euclidean algorithm is applied to $e$ and $n$. These can all easily be found. Thus, since the number of computations is bounded by $m$, we can see that the number of computations will be relatively small.
 
 \end{enumerate}
 
